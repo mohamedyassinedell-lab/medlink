@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}لوحة التحكم - {{ get_platform_setting('platform_name') }}{% endblock %}</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            200: '#ddd6fe',
+                            300: '#c4b5fd',
+                            400: '#a78bfa',
+                            500: '#8b5cf6',
+                            600: '#7c3aed',
+                            700: '#6d28d9',
+                            800: '#5b21b6',
+                            900: '#4c1d95',
+                            950: '#2e1065',
+                        },
+                        navy: {
+                            900: '#1e2d4a',
+                        }
+                    },
+                    fontFamily: {
+                        arabic: ['"Cairo"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="font-arabic bg-gray-50">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-navy-900 text-white flex-shrink-0 overflow-y-auto hidden lg:block">
+            <div class="p-4 border-b border-white/10">
+                <div class="flex items-center gap-2">
+                    <div class="w-10 h-10 bg-gradient-to-br from-primary-500 to-purple-500 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-stethoscope text-white text-xl"></i>
+                    </div>
+                    <span class="text-xl font-bold">{{ get_platform_setting('platform_name') }}</span>
+                </div>
+                <p class="text-xs text-white/50 mt-1">لوحة التحكم</p>
+            </div>
+            
+            <nav class="p-4 space-y-1">
+                <a href="{{ url_for('admin.dashboard') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 transition {% if request.endpoint == 'admin.dashboard' %}bg-white/10{% endif %}">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>لوحة التحكم</span>
+                </a>
+                <a href="{{ url_for('admin.doctors') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 transition {% if request.endpoint == 'admin.doctors' %}bg-white/10{% endif %}">
+                    <i class="fas fa-user-md"></i>
+                    <span>الأطباء</span>
+                </a>
+                <a href="{{ url_for('admin.clinics') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 transition {% if request.endpoint == 'admin.clinics' %}bg-white/10{% endif %}">
+                    <i class="fas fa-hospital"></i>
+                    <span>العيادات</span>
+                </a>
+                <a href="{{ url_for('admin.specialties') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 transition {% if request.endpoint == 'admin.specialties' %}bg-white/10{% endif %}">
+                    <i class="fas fa-stethoscope"></i>
+                    <span>التخصصات</span>
+                </a>
+                <a href="{{ url_for('admin.wilayas') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 transition {% if request.endpoint == 'admin.wilayas' %}bg-white/10{% endif %}">
+                    <i class="fas fa-map"></i>
+                    <span>الولايات</span>
+                </a>
+                <a href="{{ url_for('admin.communes') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 transition {% if request.endpoint == 'admin.communes' %}bg-white/10{% endif %}">
+                    <i class="fas fa-map-pin"></i>
+                    <span>البلديات</span>
+                </a>
+                <a href="{{ url_for('admin.services') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 transition {% if request.endpoint == 'admin.services' %}bg-white/10{% endif %}">
+                    <i class="fas fa-list"></i>
+                    <span>الخدمات</span>
+                </a>
+                <a href="{{ url_for('admin.reports') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 transition {% if request.endpoint == 'admin.reports' %}bg-white/10{% endif %}">
+                    <i class="fas fa-flag"></i>
+                    <span>البلاغات</span>
+                    {% if pending_reports > 0 %}
+                        <span class="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full mr-auto">{{ pending_reports }}</span>
+                    {% endif %}
+                </a>
+                <a href="{{ url_for('admin.settings') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 transition {% if request.endpoint == 'admin.settings' %}bg-white/10{% endif %}">
+                    <i class="fas fa-cog"></i>
+                    <span>الإعدادات</span>
+                </a>
+            </nav>
+            
+            <div class="absolute bottom-0 p-4 border-t border-white/10 w-64">
+                <a href="{{ url_for('auth.logout') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 transition text-white/70 hover:text-white">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>تسجيل الخروج</span>
+                </a>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <div class="flex-1 overflow-y-auto">
+            <!-- Top Bar -->
+            <header class="bg-white shadow-sm sticky top-0 z-10">
+                <div class="flex justify-between items-center px-6 py-4">
+                    <div class="flex items-center gap-4">
+                        <button class="lg:hidden p-2 hover:bg-gray-100 rounded-lg transition" onclick="toggleMobileMenu()">
+                            <i class="fas fa-bars text-xl"></i>
+                        </button>
+                        <h1 class="text-xl font-bold text-gray-800">{% block page_title %}لوحة التحكم{% endblock %}</h1>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <span class="text-sm text-gray-600">{{ current_user.username }}</span>
+                        <div class="w-10 h-10 bg-gradient-to-br from-primary-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold">
+                            {{ current_user.username[0]|upper }}
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Content -->
+            <main class="p-6">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="mb-4 p-4 rounded-xl {% if category == 'success' %}bg-green-50 text-green-800 border border-green-200{% elif category == 'danger' %}bg-red-50 text-red-800 border border-red-200{% elif category == 'warning' %}bg-yellow-50 text-yellow-800 border border-yellow-200{% else %}bg-blue-50 text-blue-800 border border-blue-200{% endif %}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                
+                {% block admin_content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+    
+    <!-- Mobile Menu Overlay -->
+    <div id="mobileMenu" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/50" onclick="toggleMobileMenu()"></div>
+        <div class="absolute right-0 top-0 w-72 h-full bg-navy-900 text-white p-4 overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <div class="flex items-center gap-2">
+                    <div class="w-10 h-10 bg-gradient-to-br from-primary-500 to-purple-500 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-stethoscope text-white text-xl"></i>
+                    </div>
+                    <span class="text-xl font-bold">{{ get_platform_setting('platform_name') }}</span>
+                </div>
+                <button onclick="toggleMobileMenu()" class="p-2 hover:bg-white/10 rounded-lg transition">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <nav class="space-y-1">
+                <a href="{{ url_for('admin.dashboard') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 transition">لوحة التحكم</a>
+                <a href="{{ url_for('admin.doctors') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 transition">الأطباء</a>
+                <a href="{{ url_for('admin.clinics') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 transition">العيادات</a>
+                <a href="{{ url_for('admin.specialties') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 transition">التخصصات</a>
+                <a href="{{ url_for('admin.wilayas') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 transition">الولايات</a>
+                <a href="{{ url_for('admin.communes') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 transition">البلديات</a>
+                <a href="{{ url_for('admin.services') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 transition">الخدمات</a>
+                <a href="{{ url_for('admin.reports') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 transition">البلاغات</a>
+                <a href="{{ url_for('admin.settings') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 transition">الإعدادات</a>
+                <a href="{{ url_for('auth.logout') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 transition text-white/70 hover:text-white">تسجيل الخروج</a>
+            </nav>
+        </div>
+    </div>
+    
+    <script>
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+    </script>
+    
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

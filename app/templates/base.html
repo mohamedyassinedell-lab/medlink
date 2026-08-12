@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ get_platform_setting('platform_name') }}{% endblock %}</title>
+    <meta name="description" content="{% block description %}{{ get_platform_setting('platform_description') }}{% endblock %}">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f4ff',
+                            100: '#e0e9ff', 
+                            200: '#c7d7fe',
+                            300: '#a5b9fc',
+                            400: '#7e94fa',
+                            500: '#5b72f5',
+                            600: '#3d53e8',
+                            700: '#2f42c4',
+                            800: '#27369a',
+                            900: '#1d2866',
+                            950: '#12183f',
+                        }
+                    },
+                    fontFamily: {
+                        arabic: ['"Tajawal"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Google Fonts - Tajawal (حديث وجميل) -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
+    
+    <!-- Custom CSS -->
+    <style>
+        * { font-family: 'Tajawal', sans-serif; }
+        .hero-gradient {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        .hover-lift {
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+        }
+        .hover-lift:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 40px -12px rgba(0,0,0,0.25);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #5b72f5, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(135deg, #5b72f5, #a855f7); border-radius: 10px; }
+    </style>
+    
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-gray-50" x-data="{ mobileMenu: false, showSearch: false }">
+    
+    <!-- ===== NAVBAR ===== -->
+    <nav class="bg-white/95 backdrop-blur-md shadow-sm sticky top-0 z-50 border-b border-gray-100">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo -->
+                <a href="{{ url_for('public.index') }}" class="flex items-center gap-3 group">
+                    <div class="w-12 h-12 bg-gradient-to-br from-primary-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg shadow-primary-500/30 group-hover:scale-105 transition">
+                        <i class="fas fa-heartbeat text-white text-2xl"></i>
+                    </div>
+                    <div>
+                        <span class="text-2xl font-extrabold gradient-text">{{ get_platform_setting('platform_name') }}</span>
+                        <span class="block text-[10px] text-gray-400 font-medium tracking-wider">دليل الأطباء الجزائري</span>
+                    </div>
+                </a>
+                
+                <!-- Desktop Menu -->
+                <div class="hidden lg:flex items-center gap-8">
+                    <a href="{{ url_for('public.index') }}" class="text-gray-700 hover:text-primary-600 font-semibold transition relative group">
+                        الرئيسية
+                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-600 group-hover:w-full transition-all duration-300"></span>
+                    </a>
+                    <a href="{{ url_for('public.doctors') }}" class="text-gray-700 hover:text-primary-600 font-semibold transition relative group">
+                        الأطباء
+                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-600 group-hover:w-full transition-all duration-300"></span>
+                    </a>
+                    <a href="{{ url_for('public.doctors') }}?specialty=" class="text-gray-700 hover:text-primary-600 font-semibold transition relative group">
+                        التخصصات
+                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-600 group-hover:w-full transition-all duration-300"></span>
+                    </a>
+                    <a href="{{ url_for('public.about') }}" class="text-gray-700 hover:text-primary-600 font-semibold transition relative group">
+                        من نحن
+                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-600 group-hover:w-full transition-all duration-300"></span>
+                    </a>
+                </div>
+                
+                <!-- Right Actions -->
+                <div class="flex items-center gap-3">
+                    <button @click="showSearch = !showSearch" class="p-2.5 hover:bg-gray-100 rounded-full transition">
+                        <i class="fas fa-search text-gray-600 text-lg"></i>
+                    </button>
+                    
+                    {% if current_user.is_authenticated and current_user.is_admin %}
+                        <a href="{{ url_for('admin.dashboard') }}" class="hidden lg:inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary-500 to-purple-600 text-white rounded-xl hover:shadow-lg transition font-semibold text-sm">
+                            <i class="fas fa-user-shield"></i>
+                            لوحة التحكم
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('auth.login') }}" class="hidden lg:inline-flex items-center gap-2 px-5 py-2.5 border-2 border-primary-500 text-primary-600 rounded-xl hover:bg-primary-50 transition font-semibold text-sm">
+                            <i class="fas fa-user"></i>
+                            تسجيل الدخول
+                        </a>
+                    {% endif %}
+                    
+                    <!-- Mobile Toggle -->
+                    <button @click="mobileMenu = !mobileMenu" class="lg:hidden p-2 hover:bg-gray-100 rounded-xl transition">
+                        <i class="fas fa-bars text-2xl text-gray-700"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div x-show="mobileMenu" x-transition:enter.duration.300ms x-transition:leave.duration.300ms class="lg:hidden bg-white border-t border-gray-100">
+            <div class="container mx-auto px-4 py-6 space-y-4">
+                <a href="{{ url_for('public.index') }}" class="block text-gray-700 hover:text-primary-600 font-semibold text-lg">الرئيسية</a>
+                <a href="{{ url_for('public.doctors') }}" class="block text-gray-700 hover:text-primary-600 font-semibold text-lg">الأطباء</a>
+                <a href="{{ url_for('public.doctors') }}?specialty=" class="block text-gray-700 hover:text-primary-600 font-semibold text-lg">التخصصات</a>
+                <a href="{{ url_for('public.about') }}" class="block text-gray-700 hover:text-primary-600 font-semibold text-lg">من نحن</a>
+                
+                {% if current_user.is_authenticated and current_user.is_admin %}
+                    <a href="{{ url_for('admin.dashboard') }}" class="block text-center px-5 py-3 bg-gradient-to-r from-primary-500 to-purple-600 text-white rounded-xl font-semibold">لوحة التحكم</a>
+                {% else %}
+                    <a href="{{ url_for('auth.login') }}" class="block text-center px-5 py-3 border-2 border-primary-500 text-primary-600 rounded-xl font-semibold">تسجيل الدخول</a>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Search Bar -->
+        <div x-show="showSearch" x-transition:enter.duration.300ms x-transition:leave.duration.300ms class="bg-white border-t border-gray-100">
+            <div class="container mx-auto px-4 py-5">
+                <form action="{{ url_for('public.doctors') }}" method="GET" class="flex flex-col md:flex-row gap-4">
+                    <div class="flex-1 relative">
+                        <input type="text" name="search" placeholder="ابحث عن طبيب، تخصص، ولاية، بلدية..." 
+                               class="w-full px-5 py-4 pr-14 bg-gray-50 border-0 rounded-2xl focus:ring-2 focus:ring-primary-500 focus:bg-white transition text-lg">
+                        <i class="fas fa-search absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 text-xl"></i>
+                    </div>
+                    <button type="submit" class="px-10 py-4 bg-gradient-to-r from-primary-500 to-purple-600 text-white rounded-2xl hover:shadow-xl transition font-bold text-lg">
+                        <i class="fas fa-search ml-2"></i> بحث
+                    </button>
+                </form>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- ===== FLASH MESSAGES ===== -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="container mx-auto px-4 mt-4">
+                {% for category, message in messages %}
+                    <div class="flex items-center gap-4 p-4 rounded-2xl {% if category == 'success' %}bg-green-50 text-green-800 border border-green-200{% elif category == 'danger' %}bg-red-50 text-red-800 border border-red-200{% elif category == 'warning' %}bg-yellow-50 text-yellow-800 border border-yellow-200{% else %}bg-blue-50 text-blue-800 border border-blue-200{% endif %}">
+                        <i class="fas {% if category == 'success' %}fa-check-circle{% elif category == 'danger' %}fa-exclamation-circle{% elif category == 'warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %} text-2xl"></i>
+                        <span class="flex-1">{{ message }}</span>
+                        <button onclick="this.parentElement.remove()" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+    
+    <!-- ===== MAIN CONTENT ===== -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- ===== FOOTER ===== -->
+    <footer class="bg-gradient-to-br from-gray-900 to-gray-800 text-white mt-24">
+        <div class="container mx-auto px-4 py-16">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12">
+                <div>
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-12 h-12 bg-gradient-to-br from-primary-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+                            <i class="fas fa-heartbeat text-white text-2xl"></i>
+                        </div>
+                        <span class="text-2xl font-extrabold">{{ get_platform_setting('platform_name') }}</span>
+                    </div>
+                    <p class="text-gray-400 text-sm leading-relaxed">{{ get_platform_setting('platform_description') }}</p>
+                    <div class="flex gap-4 mt-6">
+                        <a href="#" class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center hover:bg-primary-500 transition"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center hover:bg-primary-500 transition"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center hover:bg-primary-500 transition"><i class="fab fa-youtube"></i></a>
+                        <a href="#" class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center hover:bg-primary-500 transition"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-bold mb-4">روابط سريعة</h4>
+                    <ul class="space-y-3 text-gray-400">
+                        <li><a href="{{ url_for('public.index') }}" class="hover:text-white transition">الرئيسية</a></li>
+                        <li><a href="{{ url_for('public.doctors') }}" class="hover:text-white transition">الأطباء</a></li>
+                        <li><a href="{{ url_for('public.about') }}" class="hover:text-white transition">من نحن</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-bold mb-4">التخصصات</h4>
+                    <ul class="space-y-3 text-gray-400">
+                        {% for specialty in specialties[:6] %}
+                            <li><a href="{{ url_for('public.doctors') }}?specialty={{ specialty.name }}" class="hover:text-white transition">{{ specialty.name_ar }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-bold mb-4">معلومات الاتصال</h4>
+                    <ul class="space-y-3 text-gray-400">
+                        <li><i class="fas fa-phone ml-3 text-primary-400"></i> {{ get_platform_setting('platform_phone') }}</li>
+                        <li><i class="fas fa-envelope ml-3 text-primary-400"></i> {{ get_platform_setting('platform_email') }}</li>
+                        <li><i class="fas fa-map-marker-alt ml-3 text-primary-400"></i> {{ get_platform_setting('platform_address') }}</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-white/10 mt-12 pt-8 text-center text-gray-500 text-sm">
+                <p>جميع الحقوق محفوظة &copy; {{ get_platform_setting('platform_name') }} {{ now.year }}</p>
+            </div>
+        </div>
+    </footer>
+    
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

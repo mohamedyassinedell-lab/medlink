@@ -1,0 +1,120 @@
+{% extends "base_admin.html" %}
+
+{% block title %}إدارة الأطباء - {{ get_platform_setting('platform_name') }}{% endblock %}
+{% block page_title %}إدارة الأطباء{% endblock %}
+
+{% block admin_content %}
+<div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+    <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
+        <div class="flex gap-2">
+            <a href="{{ url_for('admin.doctors') }}?status=all" class="px-4 py-2 rounded-xl text-sm font-semibold {% if request.args.get('status') == 'all' or not request.args.get('status') %}bg-primary-600 text-white{% else %}bg-gray-100 text-gray-600 hover:bg-gray-200{% endif %} transition">
+                الكل
+            </a>
+            <a href="{{ url_for('admin.doctors') }}?status=published" class="px-4 py-2 rounded-xl text-sm font-semibold {% if request.args.get('status') == 'published' %}bg-primary-600 text-white{% else %}bg-gray-100 text-gray-600 hover:bg-gray-200{% endif %} transition">
+                منشور
+            </a>
+            <a href="{{ url_for('admin.doctors') }}?status=unpublished" class="px-4 py-2 rounded-xl text-sm font-semibold {% if request.args.get('status') == 'unpublished' %}bg-primary-600 text-white{% else %}bg-gray-100 text-gray-600 hover:bg-gray-200{% endif %} transition">
+                غير منشور
+            </a>
+        </div>
+        <a href="{{ url_for('admin.add_doctor') }}" class="px-4 py-2 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition font-semibold flex items-center gap-2">
+            <i class="fas fa-plus"></i>
+            إضافة طبيب
+        </a>
+    </div>
+    
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead>
+                <tr class="border-b border-gray-200">
+                    <th class="text-right py-3 px-4 text-sm font-semibold text-gray-600">الطبيب</th>
+                    <th class="text-right py-3 px-4 text-sm font-semibold text-gray-600">التخصص</th>
+                    <th class="text-right py-3 px-4 text-sm font-semibold text-gray-600">الولاية</th>
+                    <th class="text-right py-3 px-4 text-sm font-semibold text-gray-600">الحالة</th>
+                    <th class="text-right py-3 px-4 text-sm font-semibold text-gray-600">الإجراءات</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for doctor in doctors %}
+                    <tr class="border-b border-gray-100 hover:bg-gray-50 transition">
+                        <td class="py-3 px-4">
+                            <div class="flex items-center gap-3">
+                                <img src="{{ doctor.profile_image or url_for('static', filename='images/default-avatar.jpg') }}" 
+                                     alt="{{ doctor.full_name }}" class="w-10 h-10 rounded-full object-cover">
+                                <div>
+                                    <p class="font-semibold text-gray-800">{{ doctor.full_name_ar }}</p>
+                                    <p class="text-sm text-gray-500">{{ doctor.full_name }}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="py-3 px-4">{{ doctor.specialty_ref.name_ar }}</td>
+                        <td class="py-3 px-4">{{ doctor.wilaya_ref.name_ar }}</td>
+                        <td class="py-3 px-4">
+                            <div class="flex flex-col gap-1">
+                                <span class="text-sm {% if doctor.is_published %}text-green-600{% else %}text-red-600{% endif %}">
+                                    {% if doctor.is_published %}منشور{% else %}غير منشور{% endif %}
+                                </span>
+                                {% if doctor.is_verified %}
+                                    <span class="text-xs text-blue-600"><i class="fas fa-check"></i> موثق</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="py-3 px-4">
+                            <div class="flex gap-2 flex-wrap">
+                                <a href="{{ url_for('admin.edit_doctor', id=doctor.id) }}" class="text-blue-600 hover:text-blue-700">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{{ url_for('admin.manage_working_hours', id=doctor.id) }}" class="text-green-600 hover:text-green-700">
+                                    <i class="fas fa-clock"></i>
+                                </a>
+                                <a href="{{ url_for('admin.manage_holidays', id=doctor.id) }}" class="text-orange-600 hover:text-orange-700">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </a>
+                                <form action="{{ url_for('admin.toggle_publish', id=doctor.id) }}" method="POST" class="inline">
+                                    <button type="submit" class="text-gray-600 hover:text-gray-700">
+                                        <i class="fas {% if doctor.is_published %}fa-eye-slash{% else %}fa-eye{% endif %}"></i>
+                                    </button>
+                                </form>
+                                <form action="{{ url_for('admin.delete_doctor', id=doctor.id) }}" method="POST" class="inline" onsubmit="return confirm('هل أنت متأكد من حذف هذا الطبيب؟')">
+                                    <button type="submit" class="text-red-600 hover:text-red-700">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    {% if not doctors %}
+        <div class="text-center py-12">
+            <i class="fas fa-user-md text-6xl text-gray-300 mb-4"></i>
+            <h3 class="text-xl font-semibold text-gray-600">لا يوجد أطباء</h3>
+            <p class="text-gray-500">قم بإضافة طبيب جديد من خلال زر "إضافة طبيب"</p>
+        </div>
+    {% endif %}
+    
+    <!-- Pagination -->
+    {% if pagination.pages > 1 %}
+        <div class="flex justify-center gap-2 mt-6">
+            {% if pagination.has_prev %}
+                <a href="{{ url_for('admin.doctors', page=pagination.prev_num, **request.args) }}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition">السابق</a>
+            {% endif %}
+            {% for page_num in pagination.iter_pages() %}
+                {% if page_num %}
+                    <a href="{{ url_for('admin.doctors', page=page_num, **request.args) }}" class="px-4 py-2 rounded-lg {% if page_num == pagination.page %}bg-primary-600 text-white{% else %}border border-gray-300 hover:bg-gray-50{% endif %} transition">
+                        {{ page_num }}
+                    </a>
+                {% else %}
+                    <span class="px-4 py-2">...</span>
+                {% endif %}
+            {% endfor %}
+            {% if pagination.has_next %}
+                <a href="{{ url_for('admin.doctors', page=pagination.next_num, **request.args) }}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition">التالي</a>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

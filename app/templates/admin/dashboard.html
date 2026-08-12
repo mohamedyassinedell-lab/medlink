@@ -1,0 +1,119 @@
+{% extends "base_admin.html" %}
+
+{% block title %}لوحة التحكم - {{ get_platform_setting('platform_name') }}{% endblock %}
+
+{% block admin_content %}
+<div class="space-y-6">
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500 font-semibold">إجمالي الأطباء</p>
+                    <p class="text-3xl font-bold text-gray-800 mt-1">{{ doctor_count }}</p>
+                </div>
+                <div class="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-user-md text-2xl text-primary-600"></i>
+                </div>
+            </div>
+            <div class="mt-2 flex gap-4 text-sm">
+                <span class="text-green-600"><i class="fas fa-check-circle"></i> {{ published_count }} منشور</span>
+                <span class="text-blue-600"><i class="fas fa-check"></i> {{ verified_count }} موثق</span>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500 font-semibold">العيادات</p>
+                    <p class="text-3xl font-bold text-gray-800 mt-1">{{ clinic_count }}</p>
+                </div>
+                <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-hospital text-2xl text-purple-600"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500 font-semibold">التخصصات</p>
+                    <p class="text-3xl font-bold text-gray-800 mt-1">{{ specialty_count }}</p>
+                </div>
+                <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-stethoscope text-2xl text-green-600"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500 font-semibold">الولايات</p>
+                    <p class="text-3xl font-bold text-gray-800 mt-1">{{ wilaya_count }}</p>
+                </div>
+                <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-map text-2xl text-orange-600"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Activity -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">أحدث الأطباء</h3>
+            <div class="space-y-4">
+                {% for doctor in recent_doctors %}
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+                        <div class="flex items-center gap-3">
+                            <img src="{{ doctor.profile_image or url_for('static', filename='images/default-avatar.jpg') }}" 
+                                 alt="{{ doctor.full_name }}" class="w-10 h-10 rounded-full object-cover">
+                            <div>
+                                <p class="font-semibold text-gray-800">{{ doctor.full_name_ar }}</p>
+                                <p class="text-sm text-gray-500">{{ doctor.specialty_ref.name_ar }}</p>
+                            </div>
+                        </div>
+                        <span class="text-xs text-gray-400">{{ doctor.created_at.strftime('%d/%m/%Y') }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">النشاط الأخير</h3>
+            <div class="space-y-4">
+                <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-plus text-green-600"></i>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-gray-800">تم إضافة طبيب جديد</p>
+                        <p class="text-sm text-gray-500">منذ 5 دقائق</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-edit text-blue-600"></i>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-gray-800">تم تحديث بيانات طبيب</p>
+                        <p class="text-sm text-gray-500">منذ ساعة</p>
+                    </div>
+                </div>
+                {% if pending_reports > 0 %}
+                    <div class="flex items-center gap-3 p-3 bg-red-50 rounded-xl border border-red-200">
+                        <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-flag text-red-600"></i>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-red-700">{{ pending_reports }} بلاغات معلقة</p>
+                            <p class="text-sm text-red-500">بحاجة إلى مراجعة</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
