@@ -1,14 +1,13 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, abort, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, flash, abort
 from flask_login import login_required, current_user
 from ..extensions import db
 from ..models import (
-    Doctor, Clinic, Specialty, Wilaya, Commune, Service, 
+    Doctor, Clinic, Specialty, Wilaya, Commune, Service,
     WorkingHour, Holiday, Report, PlatformSetting, DoctorService
 )
 from ..forms.doctor_forms import DoctorForm, HolidayForm
 from ..forms.clinic_forms import ClinicForm
 from ..forms.admin_forms import SettingsForm
-from ..services.status_service import StatusService
 from datetime import datetime
 import os
 from werkzeug.utils import secure_filename
@@ -22,6 +21,14 @@ admin_bp = Blueprint('admin', __name__)
 def require_admin():
     if not current_user.is_admin:
         abort(403)
+
+# ======== مسار لتعبئة قاعدة البيانات (مرة واحدة) ========
+@admin_bp.route('/force-seed')
+def force_seed():
+    """تعبئة قاعدة البيانات بالبيانات الأساسية (Admin، التخصصات، الولايات، إلخ)"""
+    from app.services.seed_service import seed_database
+    seed_database()
+    return "✅ Database seeded successfully! You can now login with admin@medlink.com / Admin123!"
 
 # ======== لوحة التحكم ========
 @admin_bp.route('/')
@@ -280,19 +287,3 @@ def settings():
         if hasattr(form, key):
             getattr(form, key).data = value
     return render_template('admin/settings.html', form=form)
-
-# ======== تعبئة قاعدة البيانات (Seed) ========
-@admin_bp.route('/seed-database')
-@login_required
-def seed_database_route():
-    if not current_user.is_admin:
-        abort(403)
-    from app.services.seed_service import seed_database
-    seed_database()
-    flash('تم تعبئة قاعدة البيانات بنجاح', 'success')
-    return redirect(url_for('admin.dashboard'))
-@admin_bp.route('/seed-now')
-def seed_now():
-    from app.services.seed_service import seed_database
-    seed_database()
-    return "✅ Database seeded successfully! You can now login."
