@@ -290,3 +290,51 @@ def settings():
         if hasattr(form, key):
             getattr(form, key).data = value
     return render_template('admin/settings.html', form=form)
+# --- إدارة العيادات ---
+@admin_bp.route('/clinics')
+@login_required
+def clinics():
+    clinics_list = Clinic.query.all()
+    return render_template('admin/clinics.html', clinics=clinics_list)
+
+@admin_bp.route('/clinics/add', methods=['GET', 'POST'])
+@login_required
+def add_clinic():
+    wilayas = Wilaya.query.order_by(Wilaya.code.asc()).all()
+    if request.method == 'POST':
+        new_clinic = Clinic(
+            name_ar=request.form.get('name_ar'),
+            name=request.form.get('name'),
+            wilaya_id=request.form.get('wilaya_id'),
+            phone=request.form.get('phone'),
+            address_ar=request.form.get('address_ar')
+        )
+        db.session.add(new_clinic)
+        db.session.commit()
+        flash('تمت إضافة العيادة بنجاح', 'success')
+        return redirect(url_for('admin.clinics'))
+    return render_template('admin/clinic_form.html', wilayas=wilayas, title='إضافة عيادة جديدة')
+
+@admin_bp.route('/clinics/delete/<int:id>', methods=['POST'])
+@login_required
+def delete_clinic(id):
+    clinic = Clinic.query.get_or_404(id)
+    db.session.delete(clinic)
+    db.session.commit()
+    flash('تم حذف العيادة بنجاح', 'success')
+    return redirect(url_for('admin.clinics'))
+
+# --- حذف الولايات (مع مراعاة التبعيات) ---
+@admin_bp.route('/wilayas/delete/<int:id>', methods=['POST'])
+@login_required
+def delete_wilaya(id):
+    wilaya = Wilaya.query.get_or_404(id)
+    # حماية: التأكد أن الولاية غير مرتبطة بأطباء أو عيادات لمنع خطأ 500
+    if len(wilaya.doctors) > 0 or len(wilaya.clinics) > 0:
+        flash('لا يمكن حذف هذه الولاية لأنها مرتبطة بأطباء أو عيادات أُخرى!', 'danger')
+        return redirect(url_for('admin.wilayas'))
+    
+    db.session.delete(wilaya)
+    db.session.commit()
+    flash('تم حذف الولاية بنجاح', 'success')
+    return redirect(url_for('admin.wilayas'))

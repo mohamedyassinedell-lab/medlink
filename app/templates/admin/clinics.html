@@ -29,11 +29,18 @@
                             <p class="text-sm text-gray-500">{{ clinic.name }}</p>
                         </td>
                         <td class="py-3 px-4">{{ clinic.wilaya_ref.name_ar if clinic.wilaya_ref else '' }}</td>
-                        <td class="py-3 px-4">{{ clinic.phone }}</td>
+                        <td class="py-3 px-4">{{ clinic.phone or '-' }}</td>
                         <td class="py-3 px-4">
-                            <div class="flex gap-2">
-                                <a href="#" class="text-blue-600 hover:text-blue-700"><i class="fas fa-edit"></i></a>
-                                <button class="text-red-600 hover:text-red-700"><i class="fas fa-trash"></i></button>
+                            <div class="flex gap-3 items-center">
+                                <a href="{{ url_for('admin.edit_clinic', id=clinic.id) }}" class="text-blue-600 hover:text-blue-700">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <!-- نموذج حذف مفعل بحماية CSRF -->
+                                <form action="{{ url_for('admin.delete_clinic', id=clinic.id) }}" method="POST" onsubmit="return confirm('هل أنت متأكد من حذف هذه العيادة؟')" class="inline">
+                                    <button type="submit" class="text-red-600 hover:text-red-700 border-none bg-transparent cursor-pointer">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
                             </div>
                         </td>
                     </tr>
