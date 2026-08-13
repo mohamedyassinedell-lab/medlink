@@ -290,30 +290,6 @@ def settings():
         if hasattr(form, key):
             getattr(form, key).data = value
     return render_template('admin/settings.html', form=form)
-# --- إدارة العيادات ---
-@admin_bp.route('/clinics')
-@login_required
-def clinics():
-    clinics_list = Clinic.query.all()
-    return render_template('admin/clinics.html', clinics=clinics_list)
-
-@admin_bp.route('/clinics/add', methods=['GET', 'POST'])
-@login_required
-def add_clinic():
-    wilayas = Wilaya.query.order_by(Wilaya.code.asc()).all()
-    if request.method == 'POST':
-        new_clinic = Clinic(
-            name_ar=request.form.get('name_ar'),
-            name=request.form.get('name'),
-            wilaya_id=request.form.get('wilaya_id'),
-            phone=request.form.get('phone'),
-            address_ar=request.form.get('address_ar')
-        )
-        db.session.add(new_clinic)
-        db.session.commit()
-        flash('تمت إضافة العيادة بنجاح', 'success')
-        return redirect(url_for('admin.clinics'))
-    return render_template('admin/clinic_form.html', wilayas=wilayas, title='إضافة عيادة جديدة')
 
 @admin_bp.route('/clinics/delete/<int:id>', methods=['POST'])
 @login_required
