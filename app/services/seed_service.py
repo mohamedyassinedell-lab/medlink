@@ -9,7 +9,7 @@ def seed_database():
     
     admin = User(
         username='admin',
-        email='admin@tabibdz.com',
+        email='admin@medlink.com',
         is_admin=True,
         is_active=True
     )

@@ -9,7 +9,7 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # Admin settings
-    ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL') or 'admin@tabibdz.com'
+    ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL') or 'admin@medlink.com'
     ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD') or 'Admin123!'
     ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME') or 'admin'
     
