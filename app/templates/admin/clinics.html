@@ -25,35 +25,30 @@
                 {% for clinic in clinics %}
                     <tr class="border-b border-gray-100 hover:bg-gray-50 transition">
                         <td class="py-3 px-4">
-                            <p class="font-semibold text-gray-800">{{ clinic.name_ar or clinic.name }}</p>
-                            <p class="text-sm text-gray-500">{{ clinic.name }}</p>
+                            <p class="font-semibold text-gray-800">{{ clinic.name_ar or clinic.name or 'بدون اسم' }}</p>
                         </td>
-                        <td class="py-3 px-4">{{ clinic.wilaya_ref.name_ar if clinic.wilaya_ref else '' }}</td>
+                        <td class="py-3 px-4">
+                            {# للتحقق من العلاقة سواء كانت wilaya_ref أو wilaya #}
+                            {% if clinic.wilaya_ref %}
+                                {{ clinic.wilaya_ref.name_ar }}
+                            {% elif clinic.wilaya %}
+                                {{ clinic.wilaya.name_ar }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
                         <td class="py-3 px-4">{{ clinic.phone or '-' }}</td>
                         <td class="py-3 px-4">
-                            <div class="flex gap-3 items-center">
-                                <a href="{{ url_for('admin.edit_clinic', id=clinic.id) }}" class="text-blue-600 hover:text-blue-700">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <!-- نموذج حذف مفعل بحماية CSRF -->
-                                <form action="{{ url_for('admin.delete_clinic', id=clinic.id) }}" method="POST" onsubmit="return confirm('هل أنت متأكد من حذف هذه العيادة؟')" class="inline">
-                                    <button type="submit" class="text-red-600 hover:text-red-700 border-none bg-transparent cursor-pointer">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
-                            </div>
+                            <form action="{{ url_for('admin.delete_clinic', id=clinic.id) }}" method="POST" onsubmit="return confirm('هل أنت متأكد؟')" class="inline">
+                                <button type="submit" class="text-red-600 hover:text-red-700">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
                         </td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
-    {% if not clinics %}
-        <div class="text-center py-12">
-            <i class="fas fa-hospital text-6xl text-gray-300 mb-4"></i>
-            <h3 class="text-xl font-semibold text-gray-600">لا يوجد عيادات</h3>
-            <p class="text-gray-500">قم بإضافة عيادة جديدة</p>
-        </div>
-    {% endif %}
 </div>
 {% endblock %}
