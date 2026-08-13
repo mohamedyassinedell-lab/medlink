@@ -1,27 +1,31 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, abort, jsonify
 from flask_login import login_required, current_user
 from ..extensions import db
-from ..models import Doctor, Clinic, Specialty, Wilaya, Commune, Service, WorkingHour, Holiday, Report, PlatformSetting, DoctorService
-from ..forms.doctor_forms import DoctorForm, WorkingHourForm, HolidayForm
+from ..models import (
+    Doctor, Clinic, Specialty, Wilaya, Commune, Service, 
+    WorkingHour, Holiday, Report, PlatformSetting, DoctorService
+)
+from ..forms.doctor_forms import DoctorForm, HolidayForm
 from ..forms.clinic_forms import ClinicForm
 from ..forms.admin_forms import SettingsForm
 from ..services.status_service import StatusService
 from datetime import datetime
 import os
 from werkzeug.utils import secure_filename
+from flask import current_app
 
 admin_bp = Blueprint('admin', __name__)
 
+# ======== التحقق من أن المستخدم Admin ========
 @admin_bp.before_request
 @login_required
 def require_admin():
     if not current_user.is_admin:
         abort(403)
 
+# ======== لوحة التحكم ========
 @admin_bp.route('/')
 def dashboard():
-    """Admin dashboard"""
-    # Stats
     doctor_count = Doctor.query.count()
     clinic_count = Clinic.query.count()
     specialty_count = Specialty.query.count()
@@ -29,11 +33,7 @@ def dashboard():
     published_count = Doctor.query.filter_by(is_published=True).count()
     featured_count = Doctor.query.filter_by(is_featured=True).count()
     verified_count = Doctor.query.filter_by(is_verified=True).count()
-    
-    # Recent doctors
     recent_doctors = Doctor.query.order_by(Doctor.created_at.desc()).limit(5).all()
-    
-    # Pending reports
     pending_reports = Report.query.filter_by(status='pending').count()
     
     return render_template('admin/dashboard.html',
@@ -47,32 +47,24 @@ def dashboard():
                          recent_doctors=recent_doctors,
                          pending_reports=pending_reports)
 
+# ======== إدارة الأطباء ========
 @admin_bp.route('/doctors')
 def doctors():
-    """Manage doctors"""
     page = request.args.get('page', 1, type=int)
     per_page = 20
-    
     query = Doctor.query
-    
-    # Filter
     status = request.args.get('status', '')
     if status == 'published':
         query = query.filter_by(is_published=True)
     elif status == 'unpublished':
         query = query.filter_by(is_published=False)
-    
     pagination = query.order_by(Doctor.created_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
     doctors = pagination.items
-    
     return render_template('admin/doctors.html', doctors=doctors, pagination=pagination)
 
 @admin_bp.route('/doctors/add', methods=['GET', 'POST'])
 def add_doctor():
-    """Add new doctor"""
     form = DoctorForm()
-    
-    # Populate dropdowns
     form.specialty_id.choices = [(s.id, s.name_ar) for s in Specialty.query.filter_by(is_active=True).all()]
     form.wilaya_id.choices = [(w.id, w.name_ar) for w in Wilaya.query.all()]
     form.commune_id.choices = [(c.id, c.name_ar) for c in Commune.query.all()]
@@ -104,7 +96,6 @@ def add_doctor():
         )
         doctor.slug = doctor.generate_slug()
         
-        # Handle profile image upload
         if form.profile_image.data:
             file = form.profile_image.data
             filename = secure_filename(f"doctor_{doctor.id}_{file.filename}")
@@ -113,7 +104,6 @@ def add_doctor():
         
         db.session.add(doctor)
         db.session.commit()
-        
         flash('تم إضافة الطبيب بنجاح', 'success')
         return redirect(url_for('admin.doctors'))
     
@@ -121,10 +111,8 @@ def add_doctor():
 
 @admin_bp.route('/doctors/<int:id>/edit', methods=['GET', 'POST'])
 def edit_doctor(id):
-    """Edit doctor"""
     doctor = Doctor.query.get_or_404(id)
     form = DoctorForm(obj=doctor)
-    
     form.specialty_id.choices = [(s.id, s.name_ar) for s in Specialty.query.filter_by(is_active=True).all()]
     form.wilaya_id.choices = [(w.id, w.name_ar) for w in Wilaya.query.all()]
     form.commune_id.choices = [(c.id, c.name_ar) for c in Commune.query.all()]
@@ -133,13 +121,11 @@ def edit_doctor(id):
     if form.validate_on_submit():
         form.populate_obj(doctor)
         doctor.slug = doctor.generate_slug()
-        
         if form.profile_image.data:
             file = form.profile_image.data
             filename = secure_filename(f"doctor_{doctor.id}_{file.filename}")
             file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
             doctor.profile_image = f"/static/uploads/{filename}"
-        
         db.session.commit()
         flash('تم تحديث بيانات الطبيب بنجاح', 'success')
         return redirect(url_for('admin.doctors'))
@@ -148,7 +134,6 @@ def edit_doctor(id):
 
 @admin_bp.route('/doctors/<int:id>/delete', methods=['POST'])
 def delete_doctor(id):
-    """Delete doctor"""
     doctor = Doctor.query.get_or_404(id)
     db.session.delete(doctor)
     db.session.commit()
@@ -157,7 +142,6 @@ def delete_doctor(id):
 
 @admin_bp.route('/doctors/<int:id>/toggle-publish', methods=['POST'])
 def toggle_publish(id):
-    """Toggle doctor publish status"""
     doctor = Doctor.query.get_or_404(id)
     doctor.is_published = not doctor.is_published
     db.session.commit()
@@ -165,74 +149,44 @@ def toggle_publish(id):
     flash(f'تم {status} الطبيب بنجاح', 'success')
     return redirect(url_for('admin.doctors'))
 
+# ======== إدارة أوقات العمل ========
 @admin_bp.route('/doctors/<int:id>/working-hours', methods=['GET', 'POST'])
 def manage_working_hours(id):
-    """Manage doctor working hours"""
     doctor = Doctor.query.get_or_404(id)
-    
     if request.method == 'POST':
-        # Clear existing working hours
         WorkingHour.query.filter_by(doctor_id=doctor.id).delete()
-        
-        # Add new working hours
         for day in range(7):
             start = request.form.get(f'start_{day}')
             end = request.form.get(f'end_{day}')
             is_closed = request.form.get(f'closed_{day}') == 'on'
-            
             if not is_closed and start and end:
-                working_hour = WorkingHour(
-                    doctor_id=doctor.id,
-                    day_of_week=day,
-                    start_time=start,
-                    end_time=end,
-                    is_closed=False
-                )
-                db.session.add(working_hour)
+                wh = WorkingHour(doctor_id=doctor.id, day_of_week=day, start_time=start, end_time=end, is_closed=False)
+                db.session.add(wh)
             elif is_closed:
-                working_hour = WorkingHour(
-                    doctor_id=doctor.id,
-                    day_of_week=day,
-                    start_time='00:00',
-                    end_time='00:00',
-                    is_closed=True
-                )
-                db.session.add(working_hour)
-        
+                wh = WorkingHour(doctor_id=doctor.id, day_of_week=day, start_time='00:00', end_time='00:00', is_closed=True)
+                db.session.add(wh)
         db.session.commit()
         flash('تم تحديث أوقات العمل بنجاح', 'success')
         return redirect(url_for('admin.doctors'))
-    
-    # Get current working hours
     working_hours = {wh.day_of_week: wh for wh in doctor.working_hours.all()}
-    
     return render_template('admin/working_hours.html', doctor=doctor, working_hours=working_hours)
 
+# ======== إدارة العطلات ========
 @admin_bp.route('/doctors/<int:id>/holidays', methods=['GET', 'POST'])
 def manage_holidays(id):
-    """Manage doctor holidays"""
     doctor = Doctor.query.get_or_404(id)
     form = HolidayForm()
-    
     if form.validate_on_submit():
-        holiday = Holiday(
-            doctor_id=doctor.id,
-            start_date=form.start_date.data,
-            end_date=form.end_date.data,
-            note=form.note.data,
-            note_ar=form.note_ar.data
-        )
+        holiday = Holiday(doctor_id=doctor.id, start_date=form.start_date.data, end_date=form.end_date.data, note=form.note.data, note_ar=form.note_ar.data)
         db.session.add(holiday)
         db.session.commit()
         flash('تم إضافة العطلة بنجاح', 'success')
         return redirect(url_for('admin.manage_holidays', id=doctor.id))
-    
     holidays = doctor.holidays.order_by(Holiday.start_date.desc()).all()
     return render_template('admin/holidays.html', doctor=doctor, holidays=holidays, form=form)
 
 @admin_bp.route('/holidays/<int:id>/delete', methods=['POST'])
 def delete_holiday(id):
-    """Delete holiday"""
     holiday = Holiday.query.get_or_404(id)
     doctor_id = holiday.doctor_id
     db.session.delete(holiday)
@@ -240,112 +194,100 @@ def delete_holiday(id):
     flash('تم حذف العطلة بنجاح', 'success')
     return redirect(url_for('admin.manage_holidays', id=doctor_id))
 
+# ======== إدارة العيادات ========
 @admin_bp.route('/clinics')
 def clinics():
-    """Manage clinics"""
     clinics = Clinic.query.order_by(Clinic.created_at.desc()).all()
     return render_template('admin/clinics.html', clinics=clinics)
 
 @admin_bp.route('/clinics/add', methods=['GET', 'POST'])
 def add_clinic():
-    """Add new clinic"""
     form = ClinicForm()
     form.wilaya_id.choices = [(w.id, w.name_ar) for w in Wilaya.query.all()]
     form.commune_id.choices = [(c.id, c.name_ar) for c in Commune.query.all()]
-    
     if form.validate_on_submit():
         clinic = Clinic(
-            name=form.name.data,
-            name_ar=form.name_ar.data,
-            address=form.address.data,
-            address_ar=form.address_ar.data,
-            wilaya_id=form.wilaya_id.data,
-            commune_id=form.commune_id.data,
-            phone=form.phone.data,
-            phone_secondary=form.phone_secondary.data,
-            email=form.email.data,
-            description=form.description.data,
+            name=form.name.data, name_ar=form.name_ar.data,
+            address=form.address.data, address_ar=form.address_ar.data,
+            wilaya_id=form.wilaya_id.data, commune_id=form.commune_id.data,
+            phone=form.phone.data, phone_secondary=form.phone_secondary.data,
+            email=form.email.data, description=form.description.data,
             description_ar=form.description_ar.data,
-            latitude=form.latitude.data,
-            longitude=form.longitude.data,
-            google_maps_url=form.google_maps_url.data,
-            is_active=True
+            latitude=form.latitude.data, longitude=form.longitude.data,
+            google_maps_url=form.google_maps_url.data, is_active=True
         )
         db.session.add(clinic)
         db.session.commit()
         flash('تم إضافة العيادة بنجاح', 'success')
         return redirect(url_for('admin.clinics'))
-    
     return render_template('admin/clinic_form.html', form=form, title='إضافة عيادة')
 
+# ======== إدارة التخصصات ========
 @admin_bp.route('/specialties')
 def specialties():
-    """Manage specialties"""
     specialties = Specialty.query.order_by(Specialty.name_ar).all()
     return render_template('admin/specialties.html', specialties=specialties)
 
+# ======== إدارة الولايات ========
 @admin_bp.route('/wilayas')
 def wilayas():
-    """Manage wilayas"""
     wilayas = Wilaya.query.order_by(Wilaya.name_ar).all()
     return render_template('admin/wilayas.html', wilayas=wilayas)
 
+# ======== إدارة البلديات ========
 @admin_bp.route('/communes')
 def communes():
-    """Manage communes"""
     communes = Commune.query.join(Wilaya).order_by(Wilaya.name_ar, Commune.name_ar).all()
     return render_template('admin/communes.html', communes=communes)
 
+# ======== إدارة الخدمات ========
 @admin_bp.route('/services')
 def services():
-    """Manage services"""
     services = Service.query.order_by(Service.name_ar).all()
     return render_template('admin/services.html', services=services)
 
+# ======== إدارة البلاغات ========
 @admin_bp.route('/reports')
 def reports():
-    """Manage reports"""
     reports = Report.query.order_by(Report.created_at.desc()).all()
     return render_template('admin/reports.html', reports=reports)
 
 @admin_bp.route('/reports/<int:id>/update', methods=['POST'])
 def update_report(id):
-    """Update report status"""
     report = Report.query.get_or_404(id)
-    status = request.form.get('status')
-    notes = request.form.get('admin_notes')
-    
-    report.status = status
-    report.admin_notes = notes
+    report.status = request.form.get('status')
+    report.admin_notes = request.form.get('admin_notes')
     db.session.commit()
-    
     flash('تم تحديث البلاغ بنجاح', 'success')
     return redirect(url_for('admin.reports'))
 
+# ======== إعدادات المنصة ========
 @admin_bp.route('/settings', methods=['GET', 'POST'])
 def settings():
-    """Platform settings"""
     form = SettingsForm()
-    
-    # Load current settings
     settings = PlatformSetting.query.all()
     settings_dict = {s.key: s.value for s in settings}
-    
     if form.validate_on_submit():
-        # Update settings
         for key, value in form.data.items():
             if key in settings_dict:
                 setting = PlatformSetting.query.filter_by(key=key).first()
                 if setting:
                     setting.value = value
-                    db.session.commit()
-        
+        db.session.commit()
         flash('تم تحديث الإعدادات بنجاح', 'success')
         return redirect(url_for('admin.settings'))
-    
-    # Populate form with current values
     for key, value in settings_dict.items():
         if hasattr(form, key):
             getattr(form, key).data = value
-    
     return render_template('admin/settings.html', form=form)
+
+# ======== تعبئة قاعدة البيانات (Seed) ========
+@admin_bp.route('/seed-database')
+@login_required
+def seed_database_route():
+    if not current_user.is_admin:
+        abort(403)
+    from app.services.seed_service import seed_database
+    seed_database()
+    flash('تم تعبئة قاعدة البيانات بنجاح', 'success')
+    return redirect(url_for('admin.dashboard'))
