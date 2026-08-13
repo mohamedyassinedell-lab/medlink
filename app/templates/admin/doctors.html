@@ -40,15 +40,15 @@
                         <td class="py-3 px-4">
                             <div class="flex items-center gap-3">
                                 <img src="{{ doctor.profile_image or url_for('static', filename='images/default-avatar.jpg') }}" 
-                                     alt="{{ doctor.full_name }}" class="w-10 h-10 rounded-full object-cover">
+                                     alt="{{ doctor.full_name or '' }}" class="w-10 h-10 rounded-full object-cover">
                                 <div>
-                                    <p class="font-semibold text-gray-800">{{ doctor.full_name_ar }}</p>
-                                    <p class="text-sm text-gray-500">{{ doctor.full_name }}</p>
+                                    <p class="font-semibold text-gray-800">{{ doctor.full_name_ar or doctor.full_name or 'طبيب' }}</p>
+                                    <p class="text-sm text-gray-500">{{ doctor.full_name or '' }}</p>
                                 </div>
                             </div>
                         </td>
-                        <td class="py-3 px-4">{{ doctor.specialty_ref.name_ar }}</td>
-                        <td class="py-3 px-4">{{ doctor.wilaya_ref.name_ar }}</td>
+                        <td class="py-3 px-4">{{ doctor.specialty_ref.name_ar if doctor.specialty_ref else '' }}</td>
+                        <td class="py-3 px-4">{{ doctor.wilaya_ref.name_ar if doctor.wilaya_ref else '' }}</td>
                         <td class="py-3 px-4">
                             <div class="flex flex-col gap-1">
                                 <span class="text-sm {% if doctor.is_published %}text-green-600{% else %}text-red-600{% endif %}">
@@ -97,7 +97,7 @@
     {% endif %}
     
     <!-- Pagination -->
-    {% if pagination.pages > 1 %}
+    {% if pagination and pagination.pages > 1 %}
         <div class="flex justify-center gap-2 mt-6">
             {% if pagination.has_prev %}
                 <a href="{{ url_for('admin.doctors', page=pagination.prev_num, **request.args) }}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition">السابق</a>

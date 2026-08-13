@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, abort
+from flask import Blueprint, render_template, request, redirect, url_for, flash, abort, current_app
 from flask_login import login_required, current_user
 from ..extensions import db
 from ..models import (
@@ -11,7 +11,6 @@ from ..forms.admin_forms import SettingsForm
 from datetime import datetime
 import os
 from werkzeug.utils import secure_filename
-from flask import current_app
 
 admin_bp = Blueprint('admin', __name__)
 
@@ -174,7 +173,10 @@ def manage_working_hours(id):
         db.session.commit()
         flash('تم تحديث أوقات العمل بنجاح', 'success')
         return redirect(url_for('admin.doctors'))
-    working_hours = {wh.day_of_week: wh for wh in doctor.working_hours.all()}
+    
+    # تصحيح التعامل مع قائمة أوقات العمل بشكل آمن
+    hours_list = doctor.working_hours.all() if hasattr(doctor.working_hours, 'all') else doctor.working_hours
+    working_hours = {wh.day_of_week: wh for wh in hours_list}
     return render_template('admin/working_hours.html', doctor=doctor, working_hours=working_hours)
 
 # ======== إدارة العطلات ========
@@ -188,7 +190,9 @@ def manage_holidays(id):
         db.session.commit()
         flash('تم إضافة العطلة بنجاح', 'success')
         return redirect(url_for('admin.manage_holidays', id=doctor.id))
-    holidays = doctor.holidays.order_by(Holiday.start_date.desc()).all()
+    
+    holidays_query = doctor.holidays.order_by(Holiday.start_date.desc()) if hasattr(doctor.holidays, 'order_by') else sorted(doctor.holidays, key=lambda x: x.start_date, reverse=True)
+    holidays = holidays_query.all() if hasattr(holidays_query, 'all') else holidays_query
     return render_template('admin/holidays.html', doctor=doctor, holidays=holidays, form=form)
 
 @admin_bp.route('/holidays/<int:id>/delete', methods=['POST'])
