@@ -1,0 +1,38 @@
+{% extends "base_admin.html" %}
+
+{% block page_title %}إدارة أوقات العمل - {{ doctor.full_name_ar }}{% endblock %}
+
+{% block admin_content %}
+<div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+    <h2 class="text-2xl font-bold text-gray-800 mb-2">إدارة أوقات العمل</h2>
+    <p class="text-gray-600 mb-6">الطبيب: {{ doctor.full_name_ar }}</p>
+    
+    <form method="POST">
+        <div class="space-y-4">
+            {% for day in range(7) %}
+                {% set days = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'] %}
+                <div class="flex flex-wrap items-center gap-4 p-4 bg-gray-50 rounded-xl">
+                    <div class="w-24 font-semibold text-gray-800">{{ days[day] }}</div>
+                    <div class="flex items-center gap-3">
+                        <input type="time" name="start_{{ day }}" value="{{ working_hours[day].start_time if working_hours[day] and not working_hours[day].is_closed else '08:00' }}" class="px-3 py-2 border border-gray-300 rounded-lg">
+                        <span>إلى</span>
+                        <input type="time" name="end_{{ day }}" value="{{ working_hours[day].end_time if working_hours[day] and not working_hours[day].is_closed else '16:00' }}" class="px-3 py-2 border border-gray-300 rounded-lg">
+                    </div>
+                    <label class="flex items-center gap-2 text-sm text-gray-700">
+                        <input type="checkbox" name="closed_{{ day }}" {% if working_hours[day] and working_hours[day].is_closed %}checked{% endif %}> مغلق
+                    </label>
+                </div>
+            {% endfor %}
+        </div>
+        
+        <div class="mt-6 flex gap-4">
+            <button type="submit" class="px-6 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition font-semibold">
+                <i class="fas fa-save ml-2"></i> حفظ
+            </button>
+            <a href="{{ url_for('admin.doctors') }}" class="px-6 py-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition font-semibold">
+                إلغاء
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

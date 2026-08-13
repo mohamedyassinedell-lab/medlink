@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}من نحن - {{ get_platform_setting('platform_name') or 'MedLink' }}{% endblock %}
+
+{% block content %}
+<section class="py-16">
+    <div class="container mx-auto px-4 max-w-3xl">
+        <h1 class="text-4xl font-bold text-gray-900 mb-6">من نحن</h1>
+        <div class="prose prose-lg text-gray-700">
+            <p>{{ get_platform_setting('platform_name') or 'MedLink' }} هو دليل طبي جزائري يهدف إلى تسهيل العثور على الأطباء والعيادات في جميع أنحاء الجزائر.</p>
+            <p class="mt-4">نوفر معلومات دقيقة عن التخصصات، أوقات العمل، والعناوين لتسهيل عملية البحث عن الرعاية الصحية المناسبة.</p>
+            <p class="mt-4">للتواصل: {{ get_platform_setting('platform_email') or 'contact@medlink.com' }} أو {{ get_platform_setting('platform_phone') or '0555-555555' }}</p>
+        </div>
+    </div>
+</section>
+{% endblock %}

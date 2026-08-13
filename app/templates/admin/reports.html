@@ -1,0 +1,54 @@
+{% extends "base_admin.html" %}
+
+{% block page_title %}البلاغات{% endblock %}
+
+{% block admin_content %}
+<div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+    <h2 class="text-2xl font-bold text-gray-800 mb-6">البلاغات</h2>
+    
+    <div class="space-y-4">
+        {% for report in reports %}
+            <div class="border border-gray-200 rounded-xl p-4 {% if report.status == 'pending' %}border-red-200 bg-red-50{% elif report.status == 'resolved' %}border-green-200 bg-green-50{% endif %}">
+                <div class="flex flex-wrap justify-between items-start gap-4">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-3">
+                            <span class="px-3 py-1 rounded-full text-xs font-bold {% if report.status == 'pending' %}bg-red-500 text-white{% elif report.status == 'resolved' %}bg-green-500 text-white{% elif report.status == 'reviewed' %}bg-yellow-500 text-white{% else %}bg-gray-500 text-white{% endif %}">
+                                {{ {'pending':'معلق', 'reviewed':'تم المراجعة', 'resolved':'تم الحل', 'rejected':'مرفوض'}[report.status] }}
+                            </span>
+                            <span class="text-sm text-gray-500">{{ report.created_at.strftime('%d/%m/%Y %H:%M') }}</span>
+                        </div>
+                        <p class="font-semibold text-gray-800 mt-2">الطبيب: {{ report.doctor.full_name_ar if report.doctor else 'غير معروف' }}</p>
+                        <p class="text-sm text-gray-600 mt-1"><strong>نوع المشكلة:</strong> {{ report.issue_type }}</p>
+                        <p class="text-sm text-gray-600">{{ report.description }}</p>
+                        {% if report.reporter_name %}
+                            <p class="text-xs text-gray-500 mt-1">المبلغ: {{ report.reporter_name }}</p>
+                        {% endif %}
+                        {% if report.admin_notes %}
+                            <p class="text-sm text-gray-700 mt-2 bg-gray-100 p-2 rounded"><strong>ملاحظات المشرف:</strong> {{ report.admin_notes }}</p>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <form action="{{ url_for('admin.update_report', id=report.id) }}" method="POST" class="flex flex-col gap-2 min-w-40">
+                            <select name="status" class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                                <option value="pending" {% if report.status == 'pending' %}selected{% endif %}>معلق</option>
+                                <option value="reviewed" {% if report.status == 'reviewed' %}selected{% endif %}>تم المراجعة</option>
+                                <option value="resolved" {% if report.status == 'resolved' %}selected{% endif %}>تم الحل</option>
+                                <option value="rejected" {% if report.status == 'rejected' %}selected{% endif %}>مرفوض</option>
+                            </select>
+                            <input type="text" name="admin_notes" placeholder="ملاحظات..." class="px-3 py-2 border border-gray-300 rounded-lg text-sm" value="{{ report.admin_notes or '' }}">
+                            <button type="submit" class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition text-sm font-semibold">تحديث</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    {% if not reports %}
+        <div class="text-center py-12">
+            <i class="fas fa-flag text-6xl text-gray-300 mb-4"></i>
+            <h3 class="text-xl font-semibold text-gray-600">لا توجد بلاغات</h3>
+            <p class="text-gray-500">جميع البلاغات تم معالجتها</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
