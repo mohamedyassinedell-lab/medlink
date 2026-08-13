@@ -291,3 +291,8 @@ def seed_database_route():
     seed_database()
     flash('تم تعبئة قاعدة البيانات بنجاح', 'success')
     return redirect(url_for('admin.dashboard'))
+@admin_bp.route('/seed-now')
+def seed_now():
+    from app.services.seed_service import seed_database
+    seed_database()
+    return "✅ Database seeded successfully! You can now login."
