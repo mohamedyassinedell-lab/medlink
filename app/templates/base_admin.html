@@ -85,7 +85,7 @@
                 <a href="{{ url_for('admin.reports') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 transition {% if request.endpoint == 'admin.reports' %}bg-white/10{% endif %}">
                     <i class="fas fa-flag"></i>
                     <span>البلاغات</span>
-                    {% if pending_reports > 0 %}
+                    {% if pending_reports is defined and pending_reports and pending_reports > 0 %}
                         <span class="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full mr-auto">{{ pending_reports }}</span>
                     {% endif %}
                 </a>
