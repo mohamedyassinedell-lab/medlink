@@ -1,63 +1,11 @@
 from ..extensions import db
 from datetime import datetime
 import re
-
-class Doctor(db.Model):
-    __tablename__ = 'doctors'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    first_name = db.Column(db.String(50), nullable=False)
-    last_name = db.Column(db.String(50), nullable=False)
-    first_name_ar = db.Column(db.String(50))
-    last_name_ar = db.Column(db.String(50))
-    slug = db.Column(db.String(200), unique=True, nullable=False)
-    
-    specialty_id = db.Column(db.Integer, db.ForeignKey('specialties.id'), nullable=False)
-    sub_specialty = db.Column(db.String(100))
-    experience_years = db.Column(db.Integer)
-    bio = db.Column(db.Text)
-    bio_ar = db.Column(db.Text)
-    
-    wilaya_id = db.Column(db.Integer, db.ForeignKey('wilayas.id'), nullable=False)
-    commune_id = db.Column(db.Integer, db.ForeignKey('communes.id'), nullable=False)
-    address = db.Column(db.String(500))
-    address_ar = db.Column(db.String(500))
-    
-    phone = db.Column(db.String(20), nullable=False)
-    phone_secondary = db.Column(db.String(20))
-    email = db.Column(db.String(120))
-    
-    clinic_id = db.Column(db.Integer, db.ForeignKey('clinics.id'), nullable=False)
-    profile_image = db.Column(db.String(200))
-    
-    accepts_new_patients = db.Column(db.Boolean, default=True)
-    is_verified = db.Column(db.Boolean, default=False)
-    is_featured = db.Column(db.Boolean, default=False)
-    is_published = db.Column(db.Boolean, default=True)
-    is_active = db.Column(db.Boolean, default=True)
-    
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
-    # ===== العلاقات مع Cascade Delete =====
-    services = db.relationship('DoctorService', backref='doctor', lazy='dynamic', cascade='all, delete-orphan')
-    working_hours = db.relationship('WorkingHour', backref='doctor', lazy='dynamic', cascade='all, delete-orphan')
-    holidays = db.relationship('Holiday', backref='doctor', lazy='dynamic', cascade='all, delete-orphan')
-    reports = db.relationship('Report', backref='doctor', lazy='dynamic', cascade='all, delete-orphan')
-    
-    # العلاقات المرجعية
-    specialty_ref = db.relationship('Specialty', foreign_keys=[specialty_id])
-    wilaya_ref = db.relationship('Wilaya', foreign_keys=[wilaya_id])
-    commune_ref = db.relationship('Commune', foreign_keys=[commune_id])
-    clinic_ref = db.relationship('Clinic', foreign_keys=[clinic_id], back_populates='doctors')
-    
-    # ... (بقية الكود كما هو)from ..extensions import db
-from datetime import datetime
-import re
 from sqlalchemy.orm import validates
 
 class Doctor(db.Model):
     __tablename__ = 'doctors'
+    __table_args__ = {'extend_existing': True}
     
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(50), nullable=False)
@@ -105,43 +53,16 @@ class Doctor(db.Model):
     # العلاقات (Relationships) مع Cascade Delete
     # ============================================================
     
-    # الخدمات المقدمة من الطبيب
-    services = db.relationship(
-        'DoctorService',
-        backref='doctor',
-        lazy='dynamic',
-        cascade='all, delete-orphan'
-    )
+    services = db.relationship('DoctorService', backref='doctor', lazy='dynamic', cascade='all, delete-orphan')
+    working_hours = db.relationship('WorkingHour', backref='doctor', lazy='dynamic', cascade='all, delete-orphan')
+    holidays = db.relationship('Holiday', backref='doctor', lazy='dynamic', cascade='all, delete-orphan')
+    reports = db.relationship('Report', backref='doctor', lazy='dynamic', cascade='all, delete-orphan')
     
-    # أوقات العمل
-    working_hours = db.relationship(
-        'WorkingHour',
-        backref='doctor',
-        lazy='dynamic',
-        cascade='all, delete-orphan'
-    )
-    
-    # العطلات
-    holidays = db.relationship(
-        'Holiday',
-        backref='doctor',
-        lazy='dynamic',
-        cascade='all, delete-orphan'
-    )
-    
-    # البلاغات
-    reports = db.relationship(
-        'Report',
-        backref='doctor',
-        lazy='dynamic',
-        cascade='all, delete-orphan'
-    )
-    
-    # العلاقات المرجعية (للقراءة فقط)
+    # العلاقات المرجعية
     specialty_ref = db.relationship('Specialty', foreign_keys=[specialty_id])
     wilaya_ref = db.relationship('Wilaya', foreign_keys=[wilaya_id])
     commune_ref = db.relationship('Commune', foreign_keys=[commune_id])
-    clinic_ref = db.relationship('Clinic', foreign_keys=[clinic_id])
+    clinic_ref = db.relationship('Clinic', foreign_keys=[clinic_id], back_populates='doctors')
     
     # ============================================================
     # الخصائص المحسوبة (Properties)
@@ -149,19 +70,16 @@ class Doctor(db.Model):
     
     @property
     def full_name(self):
-        """الاسم الكامل باللاتينية"""
         return f"{self.first_name} {self.last_name}".strip()
     
     @property
     def full_name_ar(self):
-        """الاسم الكامل بالعربية"""
         if self.first_name_ar and self.last_name_ar:
             return f"{self.first_name_ar} {self.last_name_ar}".strip()
         return self.full_name
     
     @property
     def status(self):
-        """حالة الطبيب الحالية (متوفر/مغلق/في عطلة)"""
         from ..services.status_service import StatusService
         return StatusService.get_status(self)
     
@@ -170,20 +88,16 @@ class Doctor(db.Model):
     # ============================================================
     
     def generate_slug(self):
-        """توليد Slug فريد من الاسم"""
         if self.first_name and self.last_name:
             base = f"{self.first_name} {self.last_name}".lower()
         else:
             base = f"doctor-{self.id or 'new'}"
         
-        # إزالة الأحرف الخاصة واستبدال المسافات بشرطة
         slug = re.sub(r'[^\w\s-]', '', base)
         slug = re.sub(r'[-\s]+', '-', slug).strip('-')
         
-        # التأكد من عدم وجود تكرار
         existing = Doctor.query.filter(Doctor.slug == slug, Doctor.id != self.id).first()
         if existing:
-            # إضافة رقم عشوائي
             import random
             slug = f"{slug}-{random.randint(100, 999)}"
         
@@ -191,7 +105,6 @@ class Doctor(db.Model):
     
     @validates('slug')
     def validate_slug(self, key, slug):
-        """التحقق من صحة Slug"""
         if not slug:
             return self.generate_slug()
         return slug
@@ -199,19 +112,13 @@ class Doctor(db.Model):
     def __repr__(self):
         return f'<Doctor {self.full_name}>'
     
-    # ============================================================
-    # دوال للحصول على بيانات منظمة
-    # ============================================================
-    
     def get_working_hours_by_day(self):
-        """إرجاع أوقات العمل مرتبة حسب اليوم"""
         hours = {}
         for wh in self.working_hours.all():
             hours[wh.day_of_week] = wh
         return hours
     
     def get_current_holiday(self):
-        """إرجاع العطلة الحالية إن وجدت"""
         from datetime import date
         today = date.today()
         for holiday in self.holidays.all():
@@ -220,6 +127,5 @@ class Doctor(db.Model):
         return None
     
     def is_available_now(self):
-        """التحقق مما إذا كان الطبيب متوفراً الآن"""
         status = self.status
         return status.get('status') == 'AVAILABLE'

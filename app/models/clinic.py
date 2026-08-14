@@ -3,6 +3,7 @@ from datetime import datetime
 
 class Clinic(db.Model):
     __tablename__ = 'clinics'
+    __table_args__ = {'extend_existing': True}
     
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
@@ -23,13 +24,11 @@ class Clinic(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
-    # ===== 1. علاقة الأطباء (حذف الأطباء عند حذف العيادة أو فك الارتباط) =====
+    # ===== 1. علاقة الأطباء =====
     doctors = db.relationship('Doctor', back_populates='clinic_ref', lazy='dynamic')
     
-    # ===== 2. العلاقة مع الولاية (بدون cascade) =====
+    # ===== 2. العلاقة مع الولاية والبلدية =====
     wilaya_ref = db.relationship('Wilaya', foreign_keys=[wilaya_id], backref='clinics')
-    
-    # ===== 3. العلاقة مع البلدية (بدون cascade) =====
     commune_ref = db.relationship('Commune', foreign_keys=[commune_id], backref='clinics')
     
     def __repr__(self):
