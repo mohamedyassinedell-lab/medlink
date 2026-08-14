@@ -13,7 +13,7 @@ class Specialty(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     # Relationships
-    doctors = db.relationship('Doctor', backref='specialty_ref', lazy='dynamic')
+    doctors = db.relationship('Doctor', back_populates='specialty_ref', lazy='dynamic')
     
     def __repr__(self):
         return f'<Specialty {self.name_ar}>'

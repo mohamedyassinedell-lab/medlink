@@ -59,7 +59,7 @@ class Doctor(db.Model):
     reports = db.relationship('Report', backref='doctor', lazy='dynamic', cascade='all, delete-orphan')
     
     # العلاقات المرجعية
-    specialty_ref = db.relationship('Specialty', foreign_keys=[specialty_id])
+    specialty_ref = db.relationship('Specialty', foreign_keys=[specialty_id], back_populates='doctors')
     wilaya_ref = db.relationship('Wilaya', foreign_keys=[wilaya_id])
     commune_ref = db.relationship('Commune', foreign_keys=[commune_id])
     clinic_ref = db.relationship('Clinic', foreign_keys=[clinic_id], back_populates='doctors')
