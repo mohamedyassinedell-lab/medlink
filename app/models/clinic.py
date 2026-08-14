@@ -23,8 +23,14 @@ class Clinic(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
-    # Relationships
-    doctors = db.relationship('Doctor', backref='clinic_ref', lazy='dynamic')
+    # ===== العلاقات مع Cascade Delete =====
+    doctors = db.relationship('Doctor', backref='clinic_ref', lazy='dynamic', cascade='all, delete-orphan')
+    
+    # ===== العلاقة مع الولاية =====
+    wilaya_ref = db.relationship('Wilaya', foreign_keys=[wilaya_id], backref='clinics', cascade='all, delete-orphan')
+    
+    # ===== العلاقة مع البلدية =====
+    commune_ref = db.relationship('Commune', foreign_keys=[commune_id], backref='clinics', cascade='all, delete-orphan')
     
     def __repr__(self):
         return f'<Clinic {self.name_ar}>'
