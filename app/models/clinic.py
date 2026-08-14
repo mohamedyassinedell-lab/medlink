@@ -28,8 +28,8 @@ class Clinic(db.Model):
     doctors = db.relationship('Doctor', back_populates='clinic_ref', lazy='dynamic')
     
     # ===== 2. العلاقة مع الولاية والبلدية =====
-    wilaya_ref = db.relationship('Wilaya', foreign_keys=[wilaya_id], backref='clinics')
-    commune_ref = db.relationship('Commune', foreign_keys=[commune_id], backref='clinics')
+    wilaya_ref = db.relationship('Wilaya', foreign_keys=[wilaya_id])
+    commune_ref = db.relationship('Commune', foreign_keys=[commune_id])
     
     def __repr__(self):
         return f'<Clinic {self.name_ar}>'
