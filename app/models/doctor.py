@@ -49,6 +49,6 @@ class Doctor(db.Model):
     specialty_ref = db.relationship('Specialty', foreign_keys=[specialty_id])
     wilaya_ref = db.relationship('Wilaya', foreign_keys=[wilaya_id])
     commune_ref = db.relationship('Commune', foreign_keys=[commune_id])
-    clinic_ref = db.relationship('Clinic', foreign_keys=[clinic_id])
+    clinic_ref = db.relationship('Clinic', foreign_keys=[clinic_id], back_populates='doctors')
     
     # ... (بقية الكود كما هو)

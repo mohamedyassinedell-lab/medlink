@@ -24,7 +24,7 @@ class Clinic(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # ===== العلاقات مع Cascade Delete =====
-    doctors = db.relationship('Doctor', backref='clinic_ref', lazy='dynamic', cascade='all, delete-orphan')
+    doctors = db.relationship('Doctor', back_populates='clinic_ref', lazy='dynamic', cascade='all, delete-orphan')
     
     # ===== العلاقة مع الولاية =====
     wilaya_ref = db.relationship('Wilaya', foreign_keys=[wilaya_id], backref='clinics', cascade='all, delete-orphan')
