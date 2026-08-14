@@ -77,10 +77,10 @@ class Doctor(db.Model):
     # Clinic
 
     clinic_id = db.Column(
-        db.Integer,
-        db.ForeignKey('clinics.id'),
-        nullable=False
-    )
+    db.Integer,
+    db.ForeignKey('clinics.id'),
+    nullable=True
+)
 
     # Media
 
