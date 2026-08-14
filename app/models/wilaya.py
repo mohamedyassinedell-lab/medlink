@@ -1,5 +1,4 @@
 from ..extensions import db
-from datetime import datetime
 
 
 class Wilaya(db.Model):
@@ -27,10 +26,7 @@ class Wilaya(db.Model):
         nullable=False
     )
 
-    # ============================================================
     # البلديات
-    # ============================================================
-
     communes = db.relationship(
         'Commune',
         backref='wilaya',
@@ -38,10 +34,7 @@ class Wilaya(db.Model):
         cascade='all, delete-orphan'
     )
 
-    # ============================================================
     # الأطباء
-    # ============================================================
-
     doctors = db.relationship(
         'Doctor',
         backref='wilaya_ref',
@@ -49,10 +42,7 @@ class Wilaya(db.Model):
         foreign_keys='Doctor.wilaya_id'
     )
 
-    # ============================================================
     # العيادات
-    # ============================================================
-
     clinics = db.relationship(
         'Clinic',
         back_populates='wilaya_ref',
@@ -61,13 +51,8 @@ class Wilaya(db.Model):
     )
 
     def __repr__(self):
-
         return f'<Wilaya {self.name_ar}>'
 
-
-# ================================================================
-# Commune
-# ================================================================
 
 class Commune(db.Model):
 
@@ -98,10 +83,7 @@ class Commune(db.Model):
         db.String(10)
     )
 
-    # ============================================================
     # الأطباء
-    # ============================================================
-
     doctors = db.relationship(
         'Doctor',
         backref='commune_ref',
@@ -109,10 +91,7 @@ class Commune(db.Model):
         foreign_keys='Doctor.commune_id'
     )
 
-    # ============================================================
     # العيادات
-    # ============================================================
-
     clinics = db.relationship(
         'Clinic',
         back_populates='commune_ref',
@@ -121,5 +100,4 @@ class Commune(db.Model):
     )
 
     def __repr__(self):
-
         return f'<Commune {self.name_ar}>'

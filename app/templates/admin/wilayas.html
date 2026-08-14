@@ -3,13 +3,21 @@
 {% block page_title %}الولايات{% endblock %}
 
 {% block admin_content %}
-<div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
-    <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold text-gray-800">الولايات</h2>
-        <a href="#" class="px-4 py-2 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition font-semibold flex items-center gap-2">
-            <i class="fas fa-plus"></i> إضافة ولاية
-        </a>
-    </div>
+<div class="flex justify-between items-center mb-6">
+
+    <h2 class="text-2xl font-bold">
+        إدارة الولايات
+    </h2>
+
+    <a
+        href="{{ url_for('admin.add_wilaya') }}"
+        class="px-5 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700"
+    >
+        <i class="fas fa-plus ml-2"></i>
+        إضافة ولاية
+    </a>
+
+</div>
     
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {% for wilaya in wilayas %}

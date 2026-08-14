@@ -204,7 +204,7 @@ def add_doctor():
             bio_ar=form.bio_ar.data,
 
             wilaya_id=form.wilaya_id.data,
-            commune_id=form.commune_id.data,
+            commune_id=form.commune_id.data or None,
 
             address=form.address.data,
             address_ar=form.address_ar.data,
@@ -646,7 +646,7 @@ def add_clinic():
             address_ar=form.address_ar.data,
 
             wilaya_id=form.wilaya_id.data,
-            commune_id=form.commune_id.data,
+            commune_id=form.commune_id.data or None,
 
             phone=form.phone.data,
             phone_secondary=form.phone_secondary.data,
@@ -795,7 +795,67 @@ def wilayas():
         'admin/wilayas.html',
         wilayas=wilayas
     )
+# ============================================================
+# إضافة ولاية
+# ============================================================
 
+@admin_bp.route('/wilayas/add', methods=['GET', 'POST'])
+def add_wilaya():
+
+    if request.method == 'POST':
+
+        name = request.form.get('name', '').strip()
+        name_ar = request.form.get('name_ar', '').strip()
+        code = request.form.get('code', '').strip()
+
+        # التحقق من البيانات
+        if not name or not name_ar or not code:
+            flash(
+                'يرجى ملء جميع معلومات الولاية.',
+                'error'
+            )
+
+            return render_template(
+                'admin/wilaya_form.html'
+            )
+
+        # التأكد أن الكود غير مستعمل
+        existing = Wilaya.query.filter_by(
+            code=code
+        ).first()
+
+        if existing:
+            flash(
+                'رمز الولاية موجود مسبقًا.',
+                'error'
+            )
+
+            return render_template(
+                'admin/wilaya_form.html'
+            )
+
+        # إنشاء الولاية
+        wilaya = Wilaya(
+            name=name,
+            name_ar=name_ar,
+            code=code
+        )
+
+        db.session.add(wilaya)
+        db.session.commit()
+
+        flash(
+            'تمت إضافة الولاية بنجاح.',
+            'success'
+        )
+
+        return redirect(
+            url_for('admin.wilayas')
+        )
+
+    return render_template(
+        'admin/wilaya_form.html'
+    )
 
 # ============================================================
 # حذف ولاية

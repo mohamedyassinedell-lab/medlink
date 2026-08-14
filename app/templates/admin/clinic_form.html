@@ -3,66 +3,178 @@
 {% block page_title %}{{ title or 'إضافة عيادة' }}{% endblock %}
 
 {% block admin_content %}
+
 <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 max-w-2xl mx-auto">
-    <h2 class="text-2xl font-bold text-gray-800 mb-6">{{ title or 'إضافة عيادة جديدة' }}</h2>
-    
+
+    <h2 class="text-2xl font-bold text-gray-800 mb-6">
+        {{ title or 'إضافة عيادة جديدة' }}
+    </h2>
+
     <form method="POST">
-        {{ form.csrf_token if form.csrf_token else '' }}
-        
+
+        {{ form.csrf_token }}
+
         <div class="space-y-4">
+
+            <!-- اسم العيادة بالعربية -->
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">اسم العيادة (بالعربية) *</label>
-                <input type="text" name="name_ar" required value="{{ form.name_ar.data or '' }}" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500">
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                    اسم العيادة (بالعربية) *
+                </label>
+
+                <input
+                    type="text"
+                    name="name_ar"
+                    required
+                    value="{{ form.name_ar.data or '' }}"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500"
+                >
             </div>
 
+
+            <!-- اسم العيادة باللاتينية -->
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">اسم العيادة (باللاتينية)</label>
-                <input type="text" name="name" value="{{ form.name.data or '' }}" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500">
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                    اسم العيادة (باللاتينية)
+                </label>
+
+                <input
+                    type="text"
+                    name="name"
+                    value="{{ form.name.data or '' }}"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500"
+                >
             </div>
 
+
+            <!-- الولاية -->
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">الولاية *</label>
-                <select name="wilaya_id" required class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500">
-                    <option value="">اختر الولاية</option>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                    الولاية *
+                </label>
+
+                <select
+                    name="wilaya_id"
+                    required
+                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500"
+                >
+
+                    <option value="">
+                        اختر الولاية
+                    </option>
+
                     {% for wilaya in wilayas %}
-                        <option value="{{ wilaya.id }}" {% if form.wilaya_id.data == wilaya.id %}selected{% endif %}>
+
+                        <option
+                            value="{{ wilaya.id }}"
+                            {% if form.wilaya_id.data == wilaya.id %}
+                                selected
+                            {% endif %}
+                        >
                             {{ wilaya.code }} - {{ wilaya.name_ar }}
                         </option>
+
                     {% endfor %}
+
                 </select>
             </div>
 
+
+            <!-- البلدية اختيارية -->
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">البلدية *</label>
-                <select name="commune_id" required class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500">
-                    <option value="">اختر البلدية</option>
+
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                    البلدية (اختياري)
+                </label>
+
+                <select
+                    name="commune_id"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500"
+                >
+
+                    <option value="">
+                        بدون تحديد
+                    </option>
+
                     {% for commune in form.commune_id.choices %}
-                        <option value="{{ commune[0] }}" {% if form.commune_id.data == commune[0] %}selected{% endif %}>
+
+                        <option
+                            value="{{ commune[0] }}"
+                            {% if form.commune_id.data == commune[0] %}
+                                selected
+                            {% endif %}
+                        >
                             {{ commune[1] }}
                         </option>
+
                     {% endfor %}
+
                 </select>
+
+                <p class="text-xs text-gray-500 mt-1">
+                    يمكنك ترك البلدية فارغة إذا لم تتوفر معلوماتها.
+                </p>
+
             </div>
 
+
+            <!-- الهاتف -->
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">الهاتف</label>
-                <input type="text" name="phone" value="{{ form.phone.data or '' }}" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500">
+
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                    الهاتف
+                </label>
+
+                <input
+                    type="text"
+                    name="phone"
+                    value="{{ form.phone.data or '' }}"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500"
+                >
+
             </div>
 
+
+            <!-- العنوان -->
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">العنوان</label>
-                <input type="text" name="address_ar" value="{{ form.address_ar.data or '' }}" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500">
+
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                    العنوان
+                </label>
+
+                <input
+                    type="text"
+                    name="address_ar"
+                    value="{{ form.address_ar.data or '' }}"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500"
+                >
+
             </div>
+
         </div>
 
+
+        <!-- الأزرار -->
         <div class="mt-6 flex gap-4">
-            <button type="submit" class="px-6 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition font-semibold">
+
+            <button
+                type="submit"
+                class="px-6 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition font-semibold"
+            >
                 حفظ العيادة
             </button>
-            <a href="{{ url_for('admin.clinics') }}" class="px-6 py-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition font-semibold">
+
+            <a
+                href="{{ url_for('admin.clinics') }}"
+                class="px-6 py-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition font-semibold"
+            >
                 إلغاء
             </a>
+
         </div>
+
     </form>
+
 </div>
+
 {% endblock %}

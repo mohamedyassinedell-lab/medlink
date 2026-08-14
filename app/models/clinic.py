@@ -5,10 +5,7 @@ from datetime import datetime
 class Clinic(db.Model):
 
     __tablename__ = 'clinics'
-
-    __table_args__ = {
-        'extend_existing': True
-    }
+    __table_args__ = {'extend_existing': True}
 
     id = db.Column(
         db.Integer,
@@ -34,16 +31,18 @@ class Clinic(db.Model):
         db.String(500)
     )
 
+    # الولاية إجبارية
     wilaya_id = db.Column(
         db.Integer,
         db.ForeignKey('wilayas.id'),
         nullable=False
     )
 
+    # البلدية اختيارية
     commune_id = db.Column(
         db.Integer,
         db.ForeignKey('communes.id'),
-        nullable=False
+        nullable=True
     )
 
     phone = db.Column(
@@ -95,30 +94,21 @@ class Clinic(db.Model):
         onupdate=datetime.utcnow
     )
 
-    # ============================================================
     # الأطباء
-    # ============================================================
-
     doctors = db.relationship(
         'Doctor',
         back_populates='clinic_ref',
         lazy='dynamic'
     )
 
-    # ============================================================
     # الولاية
-    # ============================================================
-
     wilaya_ref = db.relationship(
         'Wilaya',
         foreign_keys=[wilaya_id],
         back_populates='clinics'
     )
 
-    # ============================================================
-    # البلدية
-    # ============================================================
-
+    # البلدية اختيارية
     commune_ref = db.relationship(
         'Commune',
         foreign_keys=[commune_id],
@@ -126,5 +116,4 @@ class Clinic(db.Model):
     )
 
     def __repr__(self):
-
         return f'<Clinic {self.name_ar}>'

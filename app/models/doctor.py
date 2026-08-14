@@ -8,28 +8,13 @@ class Doctor(db.Model):
     __tablename__ = 'doctors'
     __table_args__ = {'extend_existing': True}
 
-    id = db.Column(
-        db.Integer,
-        primary_key=True
-    )
+    id = db.Column(db.Integer, primary_key=True)
 
-    first_name = db.Column(
-        db.String(50),
-        nullable=False
-    )
+    first_name = db.Column(db.String(50), nullable=False)
+    last_name = db.Column(db.String(50), nullable=False)
 
-    last_name = db.Column(
-        db.String(50),
-        nullable=False
-    )
-
-    first_name_ar = db.Column(
-        db.String(50)
-    )
-
-    last_name_ar = db.Column(
-        db.String(50)
-    )
+    first_name_ar = db.Column(db.String(50))
+    last_name_ar = db.Column(db.String(50))
 
     slug = db.Column(
         db.String(200),
@@ -37,9 +22,7 @@ class Doctor(db.Model):
         nullable=False
     )
 
-    # ============================================================
     # Professional info
-    # ============================================================
 
     specialty_id = db.Column(
         db.Integer,
@@ -55,17 +38,10 @@ class Doctor(db.Model):
         db.Integer
     )
 
-    bio = db.Column(
-        db.Text
-    )
+    bio = db.Column(db.Text)
+    bio_ar = db.Column(db.Text)
 
-    bio_ar = db.Column(
-        db.Text
-    )
-
-    # ============================================================
     # Location
-    # ============================================================
 
     wilaya_id = db.Column(
         db.Integer,
@@ -73,23 +49,17 @@ class Doctor(db.Model):
         nullable=False
     )
 
+    # البلدية اختيارية
     commune_id = db.Column(
         db.Integer,
         db.ForeignKey('communes.id'),
-        nullable=False
+        nullable=True
     )
 
-    address = db.Column(
-        db.String(500)
-    )
+    address = db.Column(db.String(500))
+    address_ar = db.Column(db.String(500))
 
-    address_ar = db.Column(
-        db.String(500)
-    )
-
-    # ============================================================
     # Contact
-    # ============================================================
 
     phone = db.Column(
         db.String(20),
@@ -104,9 +74,7 @@ class Doctor(db.Model):
         db.String(120)
     )
 
-    # ============================================================
     # Clinic
-    # ============================================================
 
     clinic_id = db.Column(
         db.Integer,
@@ -114,17 +82,13 @@ class Doctor(db.Model):
         nullable=False
     )
 
-    # ============================================================
     # Media
-    # ============================================================
 
     profile_image = db.Column(
         db.String(200)
     )
 
-    # ============================================================
     # Status
-    # ============================================================
 
     accepts_new_patients = db.Column(
         db.Boolean,
@@ -151,9 +115,7 @@ class Doctor(db.Model):
         default=True
     )
 
-    # ============================================================
     # Timestamps
-    # ============================================================
 
     created_at = db.Column(
         db.DateTime,
@@ -166,9 +128,7 @@ class Doctor(db.Model):
         onupdate=datetime.utcnow
     )
 
-    # ============================================================
-    # العلاقات
-    # ============================================================
+    # Relationships
 
     services = db.relationship(
         'DoctorService',
@@ -198,10 +158,6 @@ class Doctor(db.Model):
         cascade='all, delete-orphan'
     )
 
-    # ============================================================
-    # العلاقات المرجعية
-    # ============================================================
-
     specialty_ref = db.relationship(
         'Specialty',
         foreign_keys=[specialty_id],
@@ -214,16 +170,13 @@ class Doctor(db.Model):
         back_populates='doctors'
     )
 
-    # ============================================================
-    # الخصائص المحسوبة
-    # ============================================================
-
     @property
     def full_name(self):
         return f"{self.first_name} {self.last_name}".strip()
 
     @property
     def full_name_ar(self):
+
         if self.first_name_ar and self.last_name_ar:
             return f"{self.first_name_ar} {self.last_name_ar}".strip()
 
@@ -234,11 +187,8 @@ class Doctor(db.Model):
         from ..services.status_service import StatusService
         return StatusService.get_status(self)
 
-    # ============================================================
-    # دوال مساعدة
-    # ============================================================
-
     def generate_slug(self):
+
         if self.first_name and self.last_name:
             base = f"{self.first_name} {self.last_name}".lower()
         else:
@@ -269,6 +219,7 @@ class Doctor(db.Model):
 
     @validates('slug')
     def validate_slug(self, key, slug):
+
         if not slug:
             return self.generate_slug()
 
@@ -278,6 +229,7 @@ class Doctor(db.Model):
         return f'<Doctor {self.full_name}>'
 
     def get_working_hours_by_day(self):
+
         hours = {}
 
         for wh in self.working_hours.all():
@@ -286,17 +238,20 @@ class Doctor(db.Model):
         return hours
 
     def get_current_holiday(self):
+
         from datetime import date
 
         today = date.today()
 
         for holiday in self.holidays.all():
+
             if holiday.start_date <= today <= holiday.end_date:
                 return holiday
 
         return None
 
     def is_available_now(self):
+
         status = self.status
 
         return status.get('status') == 'AVAILABLE'
