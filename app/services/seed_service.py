@@ -254,10 +254,10 @@ def seed_database():
             db.session.commit()
     
     platform_settings = [
-        {'key': 'platform_name', 'value': 'TabibDZ', 'category': 'general'},
+        {'key': 'platform_name', 'value': 'MedLink', 'category': 'general'},
         {'key': 'platform_description', 'value': 'دليل الأطباء والعيادات في الجزائر', 'category': 'general'},
-        {'key': 'platform_email', 'value': 'contact@tabibdz.com', 'category': 'contact'},
-        {'key': 'platform_phone', 'value': '0555-555555', 'category': 'contact'},
+        {'key': 'platform_email', 'value': 'contact@medlink.dz', 'category': 'contact'},
+        {'key': 'platform_phone', 'value': '0698766662', 'category': 'contact'},
         {'key': 'platform_address', 'value': 'الجزائر العاصمة، الجزائر', 'category': 'contact'},
     ]
     
