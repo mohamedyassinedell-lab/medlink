@@ -23,14 +23,14 @@ class Clinic(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
-    # ===== العلاقات مع Cascade Delete =====
-    doctors = db.relationship('Doctor', back_populates='clinic_ref', lazy='dynamic', cascade='all, delete-orphan')
+    # ===== 1. علاقة الأطباء (حذف الأطباء عند حذف العيادة أو فك الارتباط) =====
+    doctors = db.relationship('Doctor', back_populates='clinic_ref', lazy='dynamic')
     
-    # ===== العلاقة مع الولاية =====
-    wilaya_ref = db.relationship('Wilaya', foreign_keys=[wilaya_id], backref='clinics', cascade='all, delete-orphan')
+    # ===== 2. العلاقة مع الولاية (بدون cascade) =====
+    wilaya_ref = db.relationship('Wilaya', foreign_keys=[wilaya_id], backref='clinics')
     
-    # ===== العلاقة مع البلدية =====
-    commune_ref = db.relationship('Commune', foreign_keys=[commune_id], backref='clinics', cascade='all, delete-orphan')
+    # ===== 3. العلاقة مع البلدية (بدون cascade) =====
+    commune_ref = db.relationship('Commune', foreign_keys=[commune_id], backref='clinics')
     
     def __repr__(self):
         return f'<Clinic {self.name_ar}>'
