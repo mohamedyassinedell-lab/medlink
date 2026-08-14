@@ -3,16 +3,36 @@ from datetime import datetime
 
 
 class Clinic(db.Model):
+
     __tablename__ = 'clinics'
-    __table_args__ = {'extend_existing': True}
 
-    id = db.Column(db.Integer, primary_key=True)
+    __table_args__ = {
+        'extend_existing': True
+    }
 
-    name = db.Column(db.String(200), nullable=False)
-    name_ar = db.Column(db.String(200), nullable=False)
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
 
-    address = db.Column(db.String(500), nullable=False)
-    address_ar = db.Column(db.String(500))
+    name = db.Column(
+        db.String(200),
+        nullable=False
+    )
+
+    name_ar = db.Column(
+        db.String(200),
+        nullable=False
+    )
+
+    address = db.Column(
+        db.String(500),
+        nullable=False
+    )
+
+    address_ar = db.Column(
+        db.String(500)
+    )
 
     wilaya_id = db.Column(
         db.Integer,
@@ -26,20 +46,43 @@ class Clinic(db.Model):
         nullable=False
     )
 
-    phone = db.Column(db.String(20), nullable=False)
-    phone_secondary = db.Column(db.String(20))
+    phone = db.Column(
+        db.String(20),
+        nullable=False
+    )
 
-    email = db.Column(db.String(120))
+    phone_secondary = db.Column(
+        db.String(20)
+    )
 
-    description = db.Column(db.Text)
-    description_ar = db.Column(db.Text)
+    email = db.Column(
+        db.String(120)
+    )
 
-    latitude = db.Column(db.Float)
-    longitude = db.Column(db.Float)
+    description = db.Column(
+        db.Text
+    )
 
-    google_maps_url = db.Column(db.String(500))
+    description_ar = db.Column(
+        db.Text
+    )
 
-    is_active = db.Column(db.Boolean, default=True)
+    latitude = db.Column(
+        db.Float
+    )
+
+    longitude = db.Column(
+        db.Float
+    )
+
+    google_maps_url = db.Column(
+        db.String(500)
+    )
+
+    is_active = db.Column(
+        db.Boolean,
+        default=True
+    )
 
     created_at = db.Column(
         db.DateTime,
@@ -53,7 +96,7 @@ class Clinic(db.Model):
     )
 
     # ============================================================
-    # علاقة الأطباء
+    # الأطباء
     # ============================================================
 
     doctors = db.relationship(
@@ -63,7 +106,7 @@ class Clinic(db.Model):
     )
 
     # ============================================================
-    # العلاقة مع الولاية
+    # الولاية
     # ============================================================
 
     wilaya_ref = db.relationship(
@@ -73,7 +116,7 @@ class Clinic(db.Model):
     )
 
     # ============================================================
-    # العلاقة مع البلدية
+    # البلدية
     # ============================================================
 
     commune_ref = db.relationship(
@@ -83,4 +126,5 @@ class Clinic(db.Model):
     )
 
     def __repr__(self):
+
         return f'<Clinic {self.name_ar}>'

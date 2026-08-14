@@ -3,9 +3,13 @@ from datetime import datetime
 
 
 class Wilaya(db.Model):
+
     __tablename__ = 'wilayas'
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
 
     name = db.Column(
         db.String(50),
@@ -24,7 +28,7 @@ class Wilaya(db.Model):
     )
 
     # ============================================================
-    # العلاقات
+    # البلديات
     # ============================================================
 
     communes = db.relationship(
@@ -34,6 +38,10 @@ class Wilaya(db.Model):
         cascade='all, delete-orphan'
     )
 
+    # ============================================================
+    # الأطباء
+    # ============================================================
+
     doctors = db.relationship(
         'Doctor',
         backref='wilaya_ref',
@@ -41,7 +49,10 @@ class Wilaya(db.Model):
         foreign_keys='Doctor.wilaya_id'
     )
 
-    # العلاقة مع العيادات
+    # ============================================================
+    # العيادات
+    # ============================================================
+
     clinics = db.relationship(
         'Clinic',
         back_populates='wilaya_ref',
@@ -50,10 +61,16 @@ class Wilaya(db.Model):
     )
 
     def __repr__(self):
+
         return f'<Wilaya {self.name_ar}>'
 
 
+# ================================================================
+# Commune
+# ================================================================
+
 class Commune(db.Model):
+
     __tablename__ = 'communes'
 
     id = db.Column(
@@ -82,7 +99,7 @@ class Commune(db.Model):
     )
 
     # ============================================================
-    # العلاقات
+    # الأطباء
     # ============================================================
 
     doctors = db.relationship(
@@ -92,7 +109,10 @@ class Commune(db.Model):
         foreign_keys='Doctor.commune_id'
     )
 
-    # العلاقة مع العيادات
+    # ============================================================
+    # العيادات
+    # ============================================================
+
     clinics = db.relationship(
         'Clinic',
         back_populates='commune_ref',
@@ -101,4 +121,5 @@ class Commune(db.Model):
     )
 
     def __repr__(self):
+
         return f'<Commune {self.name_ar}>'
