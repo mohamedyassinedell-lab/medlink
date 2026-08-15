@@ -16,7 +16,7 @@ class DoctorForm(FlaskForm):
     bio_ar = TextAreaField('نبذة (عربي)')
     
     wilaya_id = SelectField('الولاية', validators=[DataRequired()], coerce=int)
-    commune_id = SelectField('البلدية', validators=[DataRequired()], coerce=int)
+    commune_id = SelectField('البلدية', validators=[], coerce=int)
     address = StringField('العنوان', validators=[Length(max=500)])
     address_ar = StringField('العنوان (عربي)', validators=[Length(max=500)])
     
