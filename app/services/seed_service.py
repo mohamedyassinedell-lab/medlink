@@ -1,5 +1,5 @@
 from ..extensions import db
-from ..models import User, Specialty, Wilaya, Service, PlatformSetting
+from ..models import User, Doctor, Clinic, Specialty, Wilaya, Commune, Service, WorkingHour, PlatformSetting
 
 
 def seed_database():
@@ -213,7 +213,189 @@ def seed_database():
 
 
     # =========================================================
-    # 4. الخدمات الطبية
+    # 4. العيادات والأطباء التجريبيون
+    # =========================================================
+
+    doctors_data = [
+        {
+            'first_name': 'Amina',
+            'last_name': 'Ben Ali',
+            'first_name_ar': 'أمينة',
+            'last_name_ar': 'بن علي',
+            'specialty': 'Cardiology',
+            'wilaya': '16',
+            'commune': 'Rouiba',
+            'commune_ar': 'الرويبة',
+            'clinic': 'Clinique Chifa Spécialisée',
+            'clinic_ar': 'عيادة الشفاء التخصصية',
+            'phone': '0555123456'
+        },
+        {
+            'first_name': 'Yassine',
+            'last_name': 'Merah',
+            'first_name_ar': 'ياسين',
+            'last_name_ar': 'مراح',
+            'specialty': 'Pediatrics',
+            'wilaya': '31',
+            'commune': 'Es Senia',
+            'commune_ar': 'السانيا',
+            'clinic': 'Centre Médical Oran',
+            'clinic_ar': 'المركز الطبي وهران',
+            'phone': '0770987654'
+        },
+        {
+            'first_name': 'Sara',
+            'last_name': 'Touati',
+            'first_name_ar': 'سارة',
+            'last_name_ar': 'تواتي',
+            'specialty': 'Dermatology',
+            'wilaya': '25',
+            'commune': 'El Khroub',
+            'commune_ar': 'الخروب',
+            'clinic': 'Clinique Ennour de Dermatologie',
+            'clinic_ar': 'عيادة النور للأمراض الجلدية',
+            'phone': '0661234567'
+        },
+        {
+            'first_name': 'Mohamed',
+            'last_name': 'Reda',
+            'first_name_ar': 'محمد',
+            'last_name_ar': 'رضا',
+            'specialty': 'Orthopedics',
+            'wilaya': '19',
+            'commune': 'El Eulma',
+            'commune_ar': 'العلمة',
+            'clinic': 'Clinique Les Hauts Plateaux',
+            'clinic_ar': 'عيادة الهضاب الطبية',
+            'phone': '0550112233'
+        },
+        {
+            'first_name': 'Leila',
+            'last_name': 'Mansouri',
+            'first_name_ar': 'ليلى',
+            'last_name_ar': 'منصوري',
+            'specialty': 'Gynecology',
+            'wilaya': '23',
+            'commune': 'El Bouni',
+            'commune_ar': 'البوني',
+            'clinic': 'Clinique El Yasmine Maternité',
+            'clinic_ar': 'عيادة الياسمين للأمومة',
+            'phone': '0772445566'
+        },
+        {
+            'first_name': 'Karim',
+            'last_name': 'Bouzid',
+            'first_name_ar': 'كريم',
+            'last_name_ar': 'بوزيد',
+            'specialty': 'Ophthalmology',
+            'wilaya': '15',
+            'commune': 'Azazga',
+            'commune_ar': 'عزازقة',
+            'clinic': 'Centre Vision Médical',
+            'clinic_ar': 'مركز الرؤية الطبي',
+            'phone': '0663778899'
+        }
+    ]
+
+    # إضافة البلديات المطلوبة إذا لم تكن موجودة
+    for data in doctors_data:
+        wilaya = Wilaya.query.filter_by(code=data['wilaya']).first()
+
+        if wilaya:
+            commune = Commune.query.filter_by(
+                name=data['commune'],
+                wilaya_id=wilaya.id
+            ).first()
+
+            if not commune:
+                commune = Commune(
+                    name=data['commune'],
+                    name_ar=data['commune_ar'],
+                    wilaya_id=wilaya.id
+                )
+                db.session.add(commune)
+
+    db.session.commit()
+
+    # إضافة العيادات المطلوبة إذا لم تكن موجودة
+    for data in doctors_data:
+        wilaya = Wilaya.query.filter_by(code=data['wilaya']).first()
+        commune = Commune.query.filter_by(
+            name=data['commune'],
+            wilaya_id=wilaya.id
+        ).first() if wilaya else None
+
+        if wilaya and commune:
+            clinic = Clinic.query.filter_by(name=data['clinic']).first()
+
+            if not clinic:
+                clinic = Clinic(
+                    name=data['clinic'],
+                    name_ar=data['clinic_ar'],
+                    address=data['commune'],
+                    address_ar=data['commune_ar'],
+                    wilaya_id=wilaya.id,
+                    commune_id=commune.id,
+                    phone=data['phone'],
+                    is_active=True
+                )
+                db.session.add(clinic)
+
+    db.session.commit()
+
+    # إضافة الأطباء
+    for data in doctors_data:
+        specialty = Specialty.query.filter_by(name=data['specialty']).first()
+        wilaya = Wilaya.query.filter_by(code=data['wilaya']).first()
+        commune = Commune.query.filter_by(
+            name=data['commune'],
+            wilaya_id=wilaya.id
+        ).first() if wilaya else None
+        clinic = Clinic.query.filter_by(name=data['clinic']).first()
+
+        # منع التكرار إذا كان الطبيب موجوداً مسبقاً
+        existing_doctor = Doctor.query.filter_by(
+            first_name=data['first_name'],
+            last_name=data['last_name']
+        ).first()
+
+        if specialty and wilaya and commune and clinic and not existing_doctor:
+            doctor = Doctor(
+                first_name=data['first_name'],
+                last_name=data['last_name'],
+                first_name_ar=data['first_name_ar'],
+                last_name_ar=data['last_name_ar'],
+                specialty_id=specialty.id,
+                wilaya_id=wilaya.id,
+                commune_id=commune.id,
+                phone=data['phone'],
+                clinic_id=clinic.id,
+                accepts_new_patients=True,
+                is_verified=True,
+                is_featured=False,
+                is_published=True,
+                is_active=True
+            )
+
+            doctor.slug = doctor.generate_slug()
+            db.session.add(doctor)
+            db.session.commit()
+
+            # أوقات العمل: 08:00 - 16:00 طوال أيام الأسبوع
+            for day in range(7):
+                wh = WorkingHour(
+                    doctor_id=doctor.id,
+                    day_of_week=day,
+                    start_time='08:00',
+                    end_time='16:00',
+                    is_closed=False
+                )
+                db.session.add(wh)
+
+            db.session.commit()
+
+    # =========================================================
+    # 5. الخدمات الطبية
     # =========================================================
 
     services_data = [
@@ -292,7 +474,7 @@ def seed_database():
 
 
     # =========================================================
-    # 5. إعدادات المنصة
+    # 6. إعدادات المنصة
     # =========================================================
 
     platform_settings = [
