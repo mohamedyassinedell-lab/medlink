@@ -92,22 +92,21 @@ def doctors():
 @public_bp.route('/doctors/<slug>')
 def doctor_detail(slug):
     """Doctor profile page"""
-    doctor = Doctor.query.filter_by(slug=slug, is_published=True, is_active=True).first_or_404()
-    
-    # Get status
+
+    doctor = Doctor.query.filter_by(slug=slug).first_or_404()
+
     status = StatusService.get_status(doctor)
-    
-    # Get services
+
     services = doctor.services.all()
-    
-    # Get working hours
     working_hours = doctor.working_hours.all()
-    
-    return render_template('public/doctor_detail.html',
-                         doctor=doctor,
-                         status=status,
-                         services=services,
-                         working_hours=working_hours)
+
+    return render_template(
+        'public/doctor_detail.html',
+        doctor=doctor,
+        status=status,
+        services=services,
+        working_hours=working_hours
+    )
 
 @public_bp.route('/api/search-doctors')
 def search_doctors():
