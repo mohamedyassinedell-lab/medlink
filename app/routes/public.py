@@ -16,17 +16,6 @@ public_bp = Blueprint('public', __name__)
 
 
 # =========================================================
-# توفير التخصصات للـ base.html
-# =========================================================
-
-@public_bp.app_context_processor
-def inject_global_data():
-    return {
-        'specialties': Specialty.query.filter_by(is_active=True).all()
-    }
-
-
-# =========================================================
 # الصفحة الرئيسية
 # =========================================================
 
@@ -78,9 +67,14 @@ def index():
 
 @public_bp.route('/doctors')
 def doctors():
-    """List all published and active doctors with filters"""
+    """List all doctors with filters"""
 
-    page = request.args.get('page', 1, type=int)
+    page = request.args.get(
+        'page',
+        1,
+        type=int
+    )
+
     per_page = 12
 
     query = Doctor.query.filter_by(
@@ -88,99 +82,148 @@ def doctors():
         is_active=True
     )
 
-    # -----------------------------------------------------
-    # الفلاتر
-    # -----------------------------------------------------
+    # -------------------------
+    # Filters
+    # -------------------------
 
-    search = request.args.get('search', '')
-    specialty = request.args.get('specialty', '')
-    wilaya = request.args.get('wilaya', '')
-    commune = request.args.get('commune', '')
-    accepts_new = request.args.get('accepts_new', '')
+    search = request.args.get(
+        'search',
+        ''
+    )
 
-    # -----------------------------------------------------
-    # البحث
-    # -----------------------------------------------------
+    specialty = request.args.get(
+        'specialty',
+        ''
+    )
+
+    wilaya = request.args.get(
+        'wilaya',
+        ''
+    )
+
+    commune = request.args.get(
+        'commune',
+        ''
+    )
+
+    available_now = request.args.get(
+        'available_now',
+        ''
+    )
+
+    accepts_new = request.args.get(
+        'accepts_new',
+        ''
+    )
+
+    # -------------------------
+    # Search
+    # -------------------------
 
     if search:
+
         search_terms = search.split()
 
         for term in search_terms:
+
             query = query.filter(
                 or_(
-                    Doctor.first_name.ilike(f'%{term}%'),
-                    Doctor.last_name.ilike(f'%{term}%'),
-                    Doctor.first_name_ar.ilike(f'%{term}%'),
-                    Doctor.last_name_ar.ilike(f'%{term}%')
+                    Doctor.first_name.ilike(
+                        f'%{term}%'
+                    ),
+
+                    Doctor.last_name.ilike(
+                        f'%{term}%'
+                    ),
+
+                    Doctor.first_name_ar.ilike(
+                        f'%{term}%'
+                    ),
+
+                    Doctor.last_name_ar.ilike(
+                        f'%{term}%'
+                    )
                 )
             )
 
-    # -----------------------------------------------------
-    # التخصص
-    # -----------------------------------------------------
+    # -------------------------
+    # Specialty
+    # -------------------------
 
     if specialty:
+
         query = query.join(
-            Specialty,
-            Doctor.specialty_id == Specialty.id
+            Specialty
         ).filter(
-            or_(
-                Specialty.name.ilike(f'%{specialty}%'),
-                Specialty.name_ar.ilike(f'%{specialty}%')
+            Specialty.name.ilike(
+                f'%{specialty}%'
+            )
+            |
+            Specialty.name_ar.ilike(
+                f'%{specialty}%'
             )
         )
 
-    # -----------------------------------------------------
-    # الولاية
-    # -----------------------------------------------------
+    # -------------------------
+    # Wilaya
+    # -------------------------
 
     if wilaya:
+
         query = query.join(
             Wilaya,
             Doctor.wilaya_id == Wilaya.id
         ).filter(
-            or_(
-                Wilaya.name.ilike(f'%{wilaya}%'),
-                Wilaya.name_ar.ilike(f'%{wilaya}%')
+            Wilaya.name.ilike(
+                f'%{wilaya}%'
+            )
+            |
+            Wilaya.name_ar.ilike(
+                f'%{wilaya}%'
             )
         )
 
-    # -----------------------------------------------------
-    # البلدية
-    # -----------------------------------------------------
+    # -------------------------
+    # Commune
+    # -------------------------
 
     if commune:
+
         query = query.join(
             Commune,
             Doctor.commune_id == Commune.id
         ).filter(
-            or_(
-                Commune.name.ilike(f'%{commune}%'),
-                Commune.name_ar.ilike(f'%{commune}%')
+            Commune.name.ilike(
+                f'%{commune}%'
+            )
+            |
+            Commune.name_ar.ilike(
+                f'%{commune}%'
             )
         )
 
-    # -----------------------------------------------------
-    # يقبل مرضى جدد
-    # -----------------------------------------------------
+    # -------------------------
+    # Accept new patients
+    # -------------------------
 
     if accepts_new == '1':
-        query = query.filter(
-            Doctor.accepts_new_patients == True
+
+        query = query.filter_by(
+            accepts_new_patients=True
         )
 
-    # -----------------------------------------------------
-    # الترتيب
-    # -----------------------------------------------------
+    # -------------------------
+    # Ordering
+    # -------------------------
 
     query = query.order_by(
         Doctor.is_featured.desc(),
         Doctor.created_at.desc()
     )
 
-    # -----------------------------------------------------
+    # -------------------------
     # Pagination
-    # -----------------------------------------------------
+    # -------------------------
 
     pagination = query.paginate(
         page=page,
@@ -188,9 +231,13 @@ def doctors():
         error_out=False
     )
 
-    doctors_list = pagination.items
+    doctors = pagination.items
 
-    specialties_list = Specialty.query.filter_by(
+    # -------------------------
+    # Filter data
+    # -------------------------
+
+    specialties = Specialty.query.filter_by(
         is_active=True
     ).all()
 
@@ -198,9 +245,9 @@ def doctors():
 
     return render_template(
         'public/doctors.html',
-        doctors=doctors_list,
+        doctors=doctors,
         pagination=pagination,
-        specialties=specialties_list,
+        specialties=specialties,
         wilayas=wilayas,
         search=search,
         selected_specialty=specialty,
@@ -215,11 +262,10 @@ def doctors():
 @public_bp.route('/doctors/<slug>')
 def doctor_detail(slug):
     """
-    عرض ملف الطبيب.
+    Doctor profile page.
 
-    ملاحظة:
-    هنا نتحقق فقط من is_published.
-    لا نشترط is_active.
+    الطبيب لازم يكون منشور فقط.
+    is_active لا يمنع عرض الملف.
     """
 
     doctor = Doctor.query.filter_by(
@@ -227,86 +273,115 @@ def doctor_detail(slug):
         is_published=True
     ).first_or_404()
 
-    # -----------------------------------------------------
-    # حالة الطبيب
-    # -----------------------------------------------------
+    # -------------------------
+    # Status
+    # -------------------------
 
-    status = StatusService.get_status(doctor)
+    status = StatusService.get_status(
+        doctor
+    )
 
-    # -----------------------------------------------------
-    # الخدمات
-    # -----------------------------------------------------
+    # -------------------------
+    # Services
+    # -------------------------
 
     services = doctor.services.all()
 
-    # -----------------------------------------------------
-    # أوقات العمل
-    # -----------------------------------------------------
+    # -------------------------
+    # Working hours
+    # -------------------------
 
     working_hours = doctor.working_hours.all()
 
-    # -----------------------------------------------------
-    # التخصصات
-    # -----------------------------------------------------
+    # -------------------------
+    # Specialties
+    # -------------------------
 
-    specialties_list = Specialty.query.filter_by(
+    specialties = Specialty.query.filter_by(
         is_active=True
     ).all()
 
-    # -----------------------------------------------------
-    # عرض الملف
-    # -----------------------------------------------------
+    # -------------------------
+    # Render
+    # -------------------------
 
     return render_template(
         'public/doctor_detail.html',
+
         doctor=doctor,
+
         status=status,
+
         services=services,
+
         working_hours=working_hours,
-        specialties=specialties_list
+
+        specialties=specialties
     )
 
 
 # =========================================================
-# البحث عن الأطباء API
+# API - Search Doctors
 # =========================================================
 
 @public_bp.route('/api/search-doctors')
 def search_doctors():
     """API endpoint for doctor search"""
 
-    q = request.args.get('q', '')
+    q = request.args.get(
+        'q',
+        ''
+    )
+
     results = []
 
     if len(q) >= 2:
 
-        doctors_list = Doctor.query.filter(
+        doctors = Doctor.query.filter(
             or_(
-                Doctor.first_name.ilike(f'%{q}%'),
-                Doctor.last_name.ilike(f'%{q}%'),
-                Doctor.first_name_ar.ilike(f'%{q}%'),
-                Doctor.last_name_ar.ilike(f'%{q}%')
+                Doctor.first_name.ilike(
+                    f'%{q}%'
+                ),
+
+                Doctor.last_name.ilike(
+                    f'%{q}%'
+                ),
+
+                Doctor.first_name_ar.ilike(
+                    f'%{q}%'
+                ),
+
+                Doctor.last_name_ar.ilike(
+                    f'%{q}%'
+                )
             ),
+
             Doctor.is_published == True,
+
             Doctor.is_active == True
+
         ).limit(5).all()
 
-        for doctor in doctors_list:
+        for doctor in doctors:
 
             results.append({
+
                 'id': doctor.id,
+
                 'name': doctor.full_name,
+
                 'name_ar': doctor.full_name_ar,
+
                 'slug': doctor.slug,
-                'specialty': (
+
+                'specialty':
                     doctor.specialty_ref.name_ar
                     if doctor.specialty_ref
-                    else ''
-                ),
-                'profile_image': (
+                    else '',
+
+                'profile_image':
                     doctor.profile_image
                     or '/static/images/default-avatar.jpg'
-                )
             })
 
     return jsonify(results)
