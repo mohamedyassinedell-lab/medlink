@@ -1,19 +1,17 @@
 {% extends "base.html" %}
 
+
 {% block title %}
-{{ doctor.full_name_ar }}
-{% if doctor.specialty_ref %}
- - {{ doctor.specialty_ref.name_ar }}
-{% endif %}
-{% if doctor.wilaya_ref %}
- - {{ doctor.wilaya_ref.name_ar }}
-{% endif %}
- | {{ get_platform_setting('platform_name') }}
+    {{ doctor.full_name_ar }}
+    -
+    {{ doctor.specialty_ref.name_ar if doctor.specialty_ref else 'التخصص غير متوفر' }}
+    |
+    {{ get_platform_setting('platform_name') }}
 {% endblock %}
 
 
 {% block description %}
-{{ doctor.bio_ar or doctor.bio or 'ملف الطبيب' }}
+    {{ doctor.bio_ar or doctor.bio or 'ملف الطبيب' }}
 {% endblock %}
 
 
@@ -23,53 +21,52 @@
 
     <div class="container mx-auto px-4">
 
-
         <!-- ================================================= -->
         <!-- Doctor Header -->
         <!-- ================================================= -->
 
         <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
 
-            <!-- Cover -->
+            <!-- Header background -->
 
             <div class="relative h-48 bg-gradient-to-r from-primary-600 to-purple-600">
 
                 {% if doctor.is_verified %}
 
-                <div class="absolute top-4 right-4 bg-blue-500 rounded-full px-4 py-1 text-white text-sm font-semibold shadow-lg">
+                    <div class="absolute top-4 right-4 bg-blue-500 rounded-full px-4 py-1 text-white text-sm font-semibold shadow-lg">
 
-                    <i class="fas fa-check"></i>
+                        <i class="fas fa-check"></i>
 
-                    موثق
+                        موثق
 
-                </div>
+                    </div>
 
                 {% endif %}
 
 
                 {% if doctor.is_featured %}
 
-                <div class="absolute top-4 left-4 bg-yellow-500 rounded-full px-4 py-1 text-white text-sm font-semibold shadow-lg">
+                    <div class="absolute top-4 left-4 bg-yellow-500 rounded-full px-4 py-1 text-white text-sm font-semibold shadow-lg">
 
-                    <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
 
-                    مميز
+                        مميز
 
-                </div>
+                    </div>
 
                 {% endif %}
 
             </div>
 
 
-            <!-- Doctor Information -->
+            <!-- Doctor information -->
 
             <div class="px-6 pb-6 -mt-16 relative">
 
                 <div class="flex flex-col md:flex-row items-start md:items-end gap-6">
 
 
-                    <!-- Image -->
+                    <!-- Profile image -->
 
                     <div class="flex-shrink-0">
 
@@ -82,7 +79,7 @@
                     </div>
 
 
-                    <!-- Name + Specialty -->
+                    <!-- Name + specialty -->
 
                     <div class="flex-1">
 
@@ -93,36 +90,32 @@
                         </h1>
 
 
-                        <!-- Specialty -->
-
-                        {% if doctor.specialty_ref %}
+                        <!-- SPECIALTY -->
 
                         <p class="text-xl text-primary-600 font-semibold">
 
-                            {{ doctor.specialty_ref.name_ar }}
+                            {% if doctor.specialty_ref %}
+
+                                {{ doctor.specialty_ref.name_ar }}
+
+                            {% else %}
+
+                                التخصص غير متوفر
+
+                            {% endif %}
 
                         </p>
 
-                        {% else %}
 
-                        <p class="text-xl text-gray-500 font-semibold">
-
-                            التخصص غير متوفر
-
-                        </p>
-
-                        {% endif %}
-
-
-                        <!-- Sub Specialty -->
+                        <!-- Sub-specialty -->
 
                         {% if doctor.sub_specialty %}
 
-                        <p class="text-gray-600">
+                            <p class="text-gray-600 mt-1">
 
-                            {{ doctor.sub_specialty }}
+                                {{ doctor.sub_specialty }}
 
-                        </p>
+                            </p>
 
                         {% endif %}
 
@@ -131,42 +124,41 @@
 
                         <div class="flex flex-wrap gap-4 mt-3">
 
-                            {% if doctor.wilaya_ref or doctor.commune_ref %}
+                            {% if doctor.wilaya_ref %}
 
-                            <span class="flex items-center gap-1 text-sm text-gray-600">
+                                <span class="flex items-center gap-1 text-sm text-gray-600">
 
-                                <i class="fas fa-map-marker-alt text-primary-500"></i>
-
-                                {% if doctor.wilaya_ref %}
+                                    <i class="fas fa-map-marker-alt text-primary-500"></i>
 
                                     {{ doctor.wilaya_ref.name_ar }}
 
-                                {% endif %}
-
-                                {% if doctor.commune_ref %}
-
-                                    ، {{ doctor.commune_ref.name_ar }}
-
-                                {% endif %}
-
-                            </span>
+                                </span>
 
                             {% endif %}
 
 
-                            <!-- Experience -->
+                            {% if doctor.commune_ref %}
+
+                                <span class="flex items-center gap-1 text-sm text-gray-600">
+
+                                    <i class="fas fa-location-dot text-primary-500"></i>
+
+                                    {{ doctor.commune_ref.name_ar }}
+
+                                </span>
+
+                            {% endif %}
+
 
                             {% if doctor.experience_years %}
 
-                            <span class="flex items-center gap-1 text-sm text-gray-600">
+                                <span class="flex items-center gap-1 text-sm text-gray-600">
 
-                                <i class="fas fa-calendar-alt text-primary-500"></i>
+                                    <i class="fas fa-calendar-alt text-primary-500"></i>
 
-                                {{ doctor.experience_years }}
+                                    {{ doctor.experience_years }} سنة خبرة
 
-                                سنة خبرة
-
-                            </span>
+                                </span>
 
                             {% endif %}
 
@@ -181,21 +173,22 @@
 
                         {% if doctor.phone %}
 
-                        <a
-                            href="tel:{{ doctor.phone }}"
-                            class="px-6 py-2 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition font-semibold"
-                        >
+                            <a
+                                href="tel:{{ doctor.phone }}"
+                                class="px-6 py-2 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition font-semibold"
+                            >
 
-                            <i class="fas fa-phone ml-1"></i>
+                                <i class="fas fa-phone ml-1"></i>
 
-                            اتصل
+                                اتصل
 
-                        </a>
+                            </a>
 
                         {% endif %}
 
 
                         <button
+                            type="button"
                             onclick="shareProfile()"
                             class="px-6 py-2 border border-gray-300 rounded-xl hover:bg-gray-50 transition"
                         >
@@ -213,24 +206,11 @@
         </div>
 
 
-
         <!-- ================================================= -->
         <!-- Status -->
         <!-- ================================================= -->
 
-        {% if status %}
-
-        <div class="mt-6 p-4 rounded-xl
-            {% if status.status == 'AVAILABLE' %}
-                bg-green-50 border border-green-200
-            {% elif status.status == 'CLOSED' %}
-                bg-orange-50 border border-orange-200
-            {% elif status.status == 'ON_VACATION' %}
-                bg-blue-50 border border-blue-200
-            {% else %}
-                bg-gray-50 border border-gray-200
-            {% endif %}
-        ">
+        <div class="mt-6 p-4 rounded-xl bg-gray-50 border border-gray-200">
 
             <div class="flex items-center gap-3">
 
@@ -249,21 +229,18 @@
 
                 {% if status.status == 'ON_VACATION' and status.return_date %}
 
-                <span class="text-sm font-semibold text-blue-700">
+                    <span class="text-sm font-semibold text-blue-700">
 
-                    يعود بتاريخ
-                    {{ status.return_date.strftime('%d/%m/%Y') }}
+                        يعود بتاريخ
+                        {{ status.return_date.strftime('%d/%m/%Y') }}
 
-                </span>
+                    </span>
 
                 {% endif %}
 
             </div>
 
         </div>
-
-        {% endif %}
-
 
 
         <!-- ================================================= -->
@@ -295,12 +272,11 @@
 
                     <p class="text-gray-700 leading-relaxed">
 
-                        {{ doctor.bio_ar or doctor.bio or 'لا توجد نبذة متاحة' }}
+                        {{ doctor.bio_ar or doctor.bio or 'المعلومات غير متوفرة' }}
 
                     </p>
 
                 </div>
-
 
 
                 <!-- ================================================= -->
@@ -309,39 +285,38 @@
 
                 {% if services %}
 
-                <div class="bg-white rounded-2xl shadow-sm p-6">
+                    <div class="bg-white rounded-2xl shadow-sm p-6">
 
-                    <h3 class="text-xl font-bold text-gray-800 mb-4">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">
 
-                        الخدمات المقدمة
+                            الخدمات المقدمة
 
-                    </h3>
+                        </h3>
 
 
-                    <div class="grid grid-cols-2 gap-3">
+                        <div class="grid grid-cols-2 gap-3">
 
-                        {% for service in services %}
+                            {% for service in services %}
 
-                        <div class="flex items-center gap-2 p-3 bg-gray-50 rounded-xl">
+                                <div class="flex items-center gap-2 p-3 bg-gray-50 rounded-xl">
 
-                            <i class="fas fa-check-circle text-primary-500"></i>
+                                    <i class="fas fa-check-circle text-primary-500"></i>
 
-                            <span>
+                                    <span>
 
-                                {{ service.service.name_ar }}
+                                        {{ service.service.name_ar }}
 
-                            </span>
+                                    </span>
+
+                                </div>
+
+                            {% endfor %}
 
                         </div>
 
-                        {% endfor %}
-
                     </div>
 
-                </div>
-
                 {% endif %}
-
 
 
                 <!-- ================================================= -->
@@ -357,143 +332,222 @@
                     </h3>
 
 
-                    <div class="space-y-3">
+                    {% if doctor.clinic_ref %}
+
+                        <div class="space-y-4">
 
 
-                        <!-- Clinic -->
+                            <!-- Clinic name -->
 
-                        {% if doctor.clinic_ref %}
+                            <div class="flex items-start gap-3">
 
-                            <p>
+                                <i class="fas fa-building text-primary-500 w-6 mt-1"></i>
 
-                                <i class="fas fa-building text-primary-500 w-6"></i>
+                                <div>
 
-                                {{ doctor.clinic_ref.name_ar }}
+                                    <div class="font-semibold text-gray-800">
 
-                            </p>
+                                        العيادة
 
-                        {% else %}
+                                    </div>
 
-                            <p class="text-gray-500">
+                                    <div class="text-gray-600">
 
-                                <i class="fas fa-building text-primary-500 w-6"></i>
+                                        {{ doctor.clinic_ref.name_ar or doctor.clinic_ref.name or 'المعلومات غير متوفرة' }}
 
-                                العيادة: المعلومات غير متوفرة
+                                    </div>
 
-                            </p>
+                                </div>
 
-                        {% endif %}
-
-
-
-                        <!-- Address -->
-
-                        {% if doctor.address_ar or doctor.address %}
-
-                            <p>
-
-                                <i class="fas fa-map-marker-alt text-primary-500 w-6"></i>
-
-                                {{ doctor.address_ar or doctor.address }}
-
-                            </p>
-
-                        {% else %}
-
-                            <p class="text-gray-500">
-
-                                <i class="fas fa-map-marker-alt text-primary-500 w-6"></i>
-
-                                العنوان: المعلومات غير متوفرة
-
-                            </p>
-
-                        {% endif %}
+                            </div>
 
 
+                            <!-- Address -->
 
-                        <!-- Phone -->
+                            <div class="flex items-start gap-3">
 
-                        {% if doctor.phone %}
+                                <i class="fas fa-map-marker-alt text-primary-500 w-6 mt-1"></i>
 
-                            <p>
+                                <div>
 
-                                <i class="fas fa-phone text-primary-500 w-6"></i>
+                                    <div class="font-semibold text-gray-800">
 
-                                {{ doctor.phone }}
+                                        العنوان
 
-                            </p>
+                                    </div>
 
-                        {% else %}
+                                    <div class="text-gray-600">
 
-                            <p class="text-gray-500">
+                                        {{ doctor.address_ar or doctor.address or doctor.clinic_ref.address_ar or doctor.clinic_ref.address or 'المعلومات غير متوفرة' }}
 
-                                <i class="fas fa-phone text-primary-500 w-6"></i>
+                                    </div>
 
-                                رقم الهاتف: المعلومات غير متوفرة
+                                </div>
 
-                            </p>
-
-                        {% endif %}
-
+                            </div>
 
 
-                        <!-- Secondary Phone -->
+                            <!-- Clinic map -->
+
+                            {% if doctor.clinic_ref.google_maps_url %}
+
+                                <a
+                                    href="{{ doctor.clinic_ref.google_maps_url }}"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition"
+                                >
+
+                                    <i class="fas fa-map-marked-alt"></i>
+
+                                    فتح الموقع على الخريطة
+
+                                </a>
+
+                            {% endif %}
+
+                        </div>
+
+                    {% else %}
+
+                        <div class="text-gray-500">
+
+                            <i class="fas fa-circle-info ml-2"></i>
+
+                            المعلومات غير متوفرة
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- ================================================= -->
+                <!-- Phone / Contact Information -->
+                <!-- ================================================= -->
+
+                <div class="bg-white rounded-2xl shadow-sm p-6">
+
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">
+
+                        معلومات الاتصال
+
+                    </h3>
+
+
+                    <div class="space-y-4">
+
+
+                        <!-- Main phone -->
+
+                        <div class="flex items-center gap-3">
+
+                            <i class="fas fa-phone text-primary-500 w-6"></i>
+
+                            <div>
+
+                                <div class="font-semibold text-gray-800">
+
+                                    رقم الهاتف
+
+                                </div>
+
+                                {% if doctor.phone %}
+
+                                    <a
+                                        href="tel:{{ doctor.phone }}"
+                                        class="text-primary-600 hover:underline"
+                                    >
+
+                                        {{ doctor.phone }}
+
+                                    </a>
+
+                                {% else %}
+
+                                    <span class="text-gray-500">
+
+                                        المعلومات غير متوفرة
+
+                                    </span>
+
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Secondary phone -->
 
                         {% if doctor.phone_secondary %}
 
-                            <p>
+                            <div class="flex items-center gap-3">
 
                                 <i class="fas fa-phone text-primary-500 w-6"></i>
 
-                                {{ doctor.phone_secondary }}
+                                <div>
 
-                            </p>
+                                    <div class="font-semibold text-gray-800">
+
+                                        رقم هاتف إضافي
+
+                                    </div>
+
+                                    <a
+                                        href="tel:{{ doctor.phone_secondary }}"
+                                        class="text-primary-600 hover:underline"
+                                    >
+
+                                        {{ doctor.phone_secondary }}
+
+                                    </a>
+
+                                </div>
+
+                            </div>
 
                         {% endif %}
-
 
 
                         <!-- Email -->
 
                         {% if doctor.email %}
 
-                            <p>
+                            <div class="flex items-center gap-3">
 
                                 <i class="fas fa-envelope text-primary-500 w-6"></i>
 
-                                {{ doctor.email }}
+                                <div>
 
-                            </p>
+                                    <div class="font-semibold text-gray-800">
+
+                                        البريد الإلكتروني
+
+                                    </div>
+
+                                    <a
+                                        href="mailto:{{ doctor.email }}"
+                                        class="text-primary-600 hover:underline"
+                                    >
+
+                                        {{ doctor.email }}
+
+                                    </a>
+
+                                </div>
+
+                            </div>
 
                         {% endif %}
 
                     </div>
 
-
-
-                    <!-- Google Maps -->
-
-                    {% if doctor.clinic_ref and doctor.clinic_ref.google_maps_url %}
-
-                    <a
-                        href="{{ doctor.clinic_ref.google_maps_url }}"
-                        target="_blank"
-                        class="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition"
-                    >
-
-                        <i class="fas fa-map-marked-alt"></i>
-
-                        فتح الموقع على الخريطة
-
-                    </a>
-
-                    {% endif %}
-
                 </div>
 
-            </div>
 
+            </div>
 
 
             <!-- ================================================= -->
@@ -518,75 +572,178 @@
 
                     {% if working_hours %}
 
-                    <div class="space-y-2">
+                        <div class="space-y-2">
 
-                        {% for wh in working_hours|sort(attribute='day_of_week') %}
+                            {% for wh in working_hours|sort(attribute='day_of_week') %}
 
-                        <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                                <div class="flex justify-between items-center py-2 border-b border-gray-100">
 
-                            <span class="font-medium">
+                                    <span class="font-medium">
 
-                                {{ wh.day_name }}
+                                        {{ wh.day_name }}
 
-                            </span>
+                                    </span>
 
 
-                            {% if wh.is_closed %}
+                                    {% if wh.is_closed %}
 
-                                <span class="text-red-500 text-sm font-semibold">
+                                        <span class="text-red-500 text-sm font-semibold">
 
-                                    مغلق
+                                            مغلق
 
-                                </span>
+                                        </span>
 
-                            {% else %}
+                                    {% else %}
 
-                                <span class="text-gray-600 text-sm">
+                                        <span class="text-gray-600 text-sm">
 
-                                    {{ wh.start_time }} - {{ wh.end_time }}
+                                            {{ wh.start_time }} -
+                                            {{ wh.end_time }}
 
-                                </span>
+                                        </span>
 
-                            {% endif %}
+                                    {% endif %}
+
+                                </div>
+
+                            {% endfor %}
 
                         </div>
 
-                        {% endfor %}
-
-                    </div>
-
                     {% else %}
 
-                    <p class="text-gray-500">
+                        <div class="text-gray-500">
 
-                        أوقات العمل: المعلومات غير متوفرة
+                            <i class="fas fa-clock ml-2"></i>
 
-                    </p>
+                            المعلومات غير متوفرة
+
+                        </div>
 
                     {% endif %}
 
                 </div>
 
 
-
                 <!-- ================================================= -->
-                <!-- Report Button -->
+                <!-- Doctor Summary -->
                 <!-- ================================================= -->
 
                 <div class="bg-white rounded-2xl shadow-sm p-6">
 
-                    <button
-                        onclick="showReportModal()"
-                        class="w-full px-4 py-2 border border-red-500 text-red-500 rounded-xl hover:bg-red-50 transition font-semibold"
-                    >
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">
 
-                        <i class="fas fa-flag"></i>
+                        معلومات الطبيب
 
-                        الإبلاغ عن معلومات خاطئة
+                    </h3>
 
-                    </button>
+
+                    <div class="space-y-3">
+
+
+                        <!-- Specialty -->
+
+                        <div class="flex items-start gap-3">
+
+                            <i class="fas fa-stethoscope text-primary-500 w-6 mt-1"></i>
+
+                            <div>
+
+                                <div class="font-semibold">
+
+                                    التخصص
+
+                                </div>
+
+                                <div class="text-gray-600">
+
+                                    {% if doctor.specialty_ref %}
+
+                                        {{ doctor.specialty_ref.name_ar }}
+
+                                    {% else %}
+
+                                        المعلومات غير متوفرة
+
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Wilaya -->
+
+                        <div class="flex items-start gap-3">
+
+                            <i class="fas fa-map text-primary-500 w-6 mt-1"></i>
+
+                            <div>
+
+                                <div class="font-semibold">
+
+                                    الولاية
+
+                                </div>
+
+                                <div class="text-gray-600">
+
+                                    {% if doctor.wilaya_ref %}
+
+                                        {{ doctor.wilaya_ref.name_ar }}
+
+                                    {% else %}
+
+                                        المعلومات غير متوفرة
+
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Commune -->
+
+                        <div class="flex items-start gap-3">
+
+                            <i class="fas fa-location-dot text-primary-500 w-6 mt-1"></i>
+
+                            <div>
+
+                                <div class="font-semibold">
+
+                                    البلدية
+
+                                </div>
+
+                                <div class="text-gray-600">
+
+                                    {% if doctor.commune_ref %}
+
+                                        {{ doctor.commune_ref.name_ar }}
+
+                                    {% else %}
+
+                                        المعلومات غير متوفرة
+
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                    </div>
 
                 </div>
+
 
             </div>
 
@@ -597,116 +754,9 @@
 </section>
 
 
-
 <!-- ========================================================= -->
-<!-- Report Modal -->
+<!-- JavaScript -->
 <!-- ========================================================= -->
-
-<div
-    id="reportModal"
-    class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center"
->
-
-    <div class="bg-white rounded-2xl p-6 max-w-md w-full mx-4">
-
-        <h3 class="text-xl font-bold text-gray-800 mb-4">
-
-            الإبلاغ عن معلومات خاطئة
-
-        </h3>
-
-
-        <!--
-        مهم:
-        في النسخة الحالية public.py لا يوجد route باسم
-        public.report_doctor.
-        
-        لذلك نخلي الزر ظاهر بدون form action
-        باش ما يطيحش BuildError.
-        -->
-
-        <div class="space-y-4">
-
-            <div>
-
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-
-                    نوع المشكلة
-
-                </label>
-
-                <select
-                    name="issue_type"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                >
-
-                    <option value="wrong_phone">
-                        رقم الهاتف خاطئ
-                    </option>
-
-                    <option value="wrong_address">
-                        العنوان خاطئ
-                    </option>
-
-                    <option value="not_working">
-                        الطبيب لم يعد يعمل هنا
-                    </option>
-
-                    <option value="wrong_info">
-                        معلومات الطبيب غير صحيحة
-                    </option>
-
-                    <option value="clinic_closed">
-                        العيادة مغلقة
-                    </option>
-
-                    <option value="other">
-                        أخرى
-                    </option>
-
-                </select>
-
-            </div>
-
-
-            <div>
-
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-
-                    الوصف
-
-                </label>
-
-                <textarea
-                    name="description"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                    rows="4"
-                ></textarea>
-
-            </div>
-
-
-            <div class="flex gap-3">
-
-                <button
-                    type="button"
-                    onclick="hideReportModal()"
-                    class="flex-1 px-4 py-2 border border-gray-300 rounded-xl hover:bg-gray-50 transition"
-                >
-
-                    إلغاء
-
-                </button>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-
-
 
 <script>
 
@@ -716,57 +766,51 @@ function shareProfile() {
 
         navigator.share({
 
-            title: '{{ doctor.full_name_ar }}',
+            title: {{ doctor.full_name_ar|tojson }},
 
             text:
-                '{% if doctor.specialty_ref %}{{ doctor.specialty_ref.name_ar }}{% endif %}',
+                {{ (
+                    (doctor.specialty_ref.name_ar
+                    if doctor.specialty_ref
+                    else 'طبيب')
+                    ~ ' - ' ~
+                    (doctor.wilaya_ref.name_ar
+                    if doctor.wilaya_ref
+                    else '')
+                )|tojson }},
 
             url: window.location.href
 
-        });
+        }).catch(function () {});
 
     } else {
 
-        navigator.clipboard.writeText(
-            window.location.href
-        );
+        if (navigator.clipboard) {
 
-        alert('تم نسخ الرابط إلى الحافظة');
+            navigator.clipboard
+                .writeText(window.location.href)
+                .then(function () {
+
+                    alert('تم نسخ الرابط إلى الحافظة');
+
+                })
+                .catch(function () {
+
+                    alert('يمكنك نسخ الرابط من المتصفح');
+
+                });
+
+        } else {
+
+            alert('يمكنك نسخ الرابط من المتصفح');
+
+        }
 
     }
 
 }
 
-
-function showReportModal() {
-
-    document
-        .getElementById('reportModal')
-        .classList
-        .remove('hidden');
-
-    document
-        .getElementById('reportModal')
-        .classList
-        .add('flex');
-
-}
-
-
-function hideReportModal() {
-
-    document
-        .getElementById('reportModal')
-        .classList
-        .add('hidden');
-
-    document
-        .getElementById('reportModal')
-        .classList
-        .remove('flex');
-
-}
-
 </script>
+
 
 {% endblock %}

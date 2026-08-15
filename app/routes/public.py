@@ -15,9 +15,31 @@ from sqlalchemy import or_
 public_bp = Blueprint('public', __name__)
 
 
-# =========================================================
-# الصفحة الرئيسية
-# =========================================================
+# ============================================================
+# PUBLIC CONTEXT
+# ============================================================
+
+@public_bp.context_processor
+def inject_public_data():
+    """
+    Variables available automatically in all public templates.
+    This prevents 'specialties is undefined' errors in base.html.
+    """
+    try:
+        specialties = Specialty.query.filter_by(
+            is_active=True
+        ).all()
+    except Exception:
+        specialties = []
+
+    return {
+        'specialties': specialties
+    }
+
+
+# ============================================================
+# HOME
+# ============================================================
 
 @public_bp.route('/')
 def index():
@@ -61,9 +83,9 @@ def index():
     )
 
 
-# =========================================================
-# قائمة الأطباء
-# =========================================================
+# ============================================================
+# DOCTORS LIST
+# ============================================================
 
 @public_bp.route('/doctors')
 def doctors():
@@ -77,48 +99,49 @@ def doctors():
 
     per_page = 12
 
+    # --------------------------------------------------------
+    # IMPORTANT:
+    # The doctors list still requires active + published.
+    # This does NOT affect the doctor detail page.
+    # --------------------------------------------------------
+
     query = Doctor.query.filter_by(
         is_published=True,
         is_active=True
     )
 
-    # -------------------------
+    # --------------------------------------------------------
     # Filters
-    # -------------------------
+    # --------------------------------------------------------
 
     search = request.args.get(
         'search',
         ''
-    )
+    ).strip()
 
     specialty = request.args.get(
         'specialty',
         ''
-    )
+    ).strip()
 
     wilaya = request.args.get(
         'wilaya',
         ''
-    )
+    ).strip()
 
     commune = request.args.get(
         'commune',
         ''
-    )
-
-    available_now = request.args.get(
-        'available_now',
-        ''
-    )
+    ).strip()
 
     accepts_new = request.args.get(
         'accepts_new',
         ''
     )
 
-    # -------------------------
+    # --------------------------------------------------------
     # Search
-    # -------------------------
+    # --------------------------------------------------------
 
     if search:
 
@@ -146,27 +169,29 @@ def doctors():
                 )
             )
 
-    # -------------------------
-    # Specialty
-    # -------------------------
+    # --------------------------------------------------------
+    # Specialty filter
+    # --------------------------------------------------------
 
     if specialty:
 
         query = query.join(
             Specialty
         ).filter(
-            Specialty.name.ilike(
-                f'%{specialty}%'
-            )
-            |
-            Specialty.name_ar.ilike(
-                f'%{specialty}%'
+            or_(
+                Specialty.name.ilike(
+                    f'%{specialty}%'
+                ),
+
+                Specialty.name_ar.ilike(
+                    f'%{specialty}%'
+                )
             )
         )
 
-    # -------------------------
-    # Wilaya
-    # -------------------------
+    # --------------------------------------------------------
+    # Wilaya filter
+    # --------------------------------------------------------
 
     if wilaya:
 
@@ -174,18 +199,20 @@ def doctors():
             Wilaya,
             Doctor.wilaya_id == Wilaya.id
         ).filter(
-            Wilaya.name.ilike(
-                f'%{wilaya}%'
-            )
-            |
-            Wilaya.name_ar.ilike(
-                f'%{wilaya}%'
+            or_(
+                Wilaya.name.ilike(
+                    f'%{wilaya}%'
+                ),
+
+                Wilaya.name_ar.ilike(
+                    f'%{wilaya}%'
+                )
             )
         )
 
-    # -------------------------
-    # Commune
-    # -------------------------
+    # --------------------------------------------------------
+    # Commune filter
+    # --------------------------------------------------------
 
     if commune:
 
@@ -193,37 +220,39 @@ def doctors():
             Commune,
             Doctor.commune_id == Commune.id
         ).filter(
-            Commune.name.ilike(
-                f'%{commune}%'
-            )
-            |
-            Commune.name_ar.ilike(
-                f'%{commune}%'
+            or_(
+                Commune.name.ilike(
+                    f'%{commune}%'
+                ),
+
+                Commune.name_ar.ilike(
+                    f'%{commune}%'
+                )
             )
         )
 
-    # -------------------------
-    # Accept new patients
-    # -------------------------
+    # --------------------------------------------------------
+    # Accepting new patients
+    # --------------------------------------------------------
 
     if accepts_new == '1':
 
-        query = query.filter_by(
-            accepts_new_patients=True
+        query = query.filter(
+            Doctor.accepts_new_patients == True
         )
 
-    # -------------------------
+    # --------------------------------------------------------
     # Ordering
-    # -------------------------
+    # --------------------------------------------------------
 
     query = query.order_by(
         Doctor.is_featured.desc(),
         Doctor.created_at.desc()
     )
 
-    # -------------------------
+    # --------------------------------------------------------
     # Pagination
-    # -------------------------
+    # --------------------------------------------------------
 
     pagination = query.paginate(
         page=page,
@@ -231,11 +260,11 @@ def doctors():
         error_out=False
     )
 
-    doctors = pagination.items
+    doctors_list = pagination.items
 
-    # -------------------------
+    # --------------------------------------------------------
     # Filter data
-    # -------------------------
+    # --------------------------------------------------------
 
     specialties = Specialty.query.filter_by(
         is_active=True
@@ -245,7 +274,7 @@ def doctors():
 
     return render_template(
         'public/doctors.html',
-        doctors=doctors,
+        doctors=doctors_list,
         pagination=pagination,
         specialties=specialties,
         wilayas=wilayas,
@@ -255,17 +284,21 @@ def doctors():
     )
 
 
-# =========================================================
-# ملف الطبيب
-# =========================================================
+# ============================================================
+# DOCTOR DETAIL
+# ============================================================
 
 @public_bp.route('/doctors/<slug>')
 def doctor_detail(slug):
     """
-    Doctor profile page.
+    Public doctor profile.
 
-    الطبيب لازم يكون منشور فقط.
-    is_active لا يمنع عرض الملف.
+    IMPORTANT:
+    Only is_published is required here.
+    is_active is intentionally NOT checked.
+
+    This allows a published doctor profile to be opened
+    even if is_active=False.
     """
 
     doctor = Doctor.query.filter_by(
@@ -273,37 +306,63 @@ def doctor_detail(slug):
         is_published=True
     ).first_or_404()
 
-    # -------------------------
-    # Status
-    # -------------------------
-
-    status = StatusService.get_status(
-        doctor
-    )
-
-    # -------------------------
+    # --------------------------------------------------------
     # Services
-    # -------------------------
+    # --------------------------------------------------------
 
-    services = doctor.services.all()
+    try:
+        services = doctor.services.all()
+    except Exception:
+        services = []
 
-    # -------------------------
+    # --------------------------------------------------------
     # Working hours
-    # -------------------------
+    # --------------------------------------------------------
 
-    working_hours = doctor.working_hours.all()
+    try:
+        working_hours = doctor.working_hours.all()
+    except Exception:
+        working_hours = []
 
-    # -------------------------
+    # --------------------------------------------------------
+    # Status
+    # --------------------------------------------------------
+
+    if working_hours:
+
+        try:
+            status = StatusService.get_status(
+                doctor
+            )
+
+        except Exception:
+            status = {
+                'status': 'UNKNOWN',
+                'label': 'ℹ️',
+                'message': 'المعلومات غير متوفرة',
+                'return_date': None
+            }
+
+    else:
+
+        status = {
+            'status': 'UNKNOWN',
+            'label': 'ℹ️',
+            'message': 'أوقات العمل غير متوفرة',
+            'return_date': None
+        }
+
+    # --------------------------------------------------------
     # Specialties
-    # -------------------------
+    # --------------------------------------------------------
 
     specialties = Specialty.query.filter_by(
         is_active=True
     ).all()
 
-    # -------------------------
+    # --------------------------------------------------------
     # Render
-    # -------------------------
+    # --------------------------------------------------------
 
     return render_template(
         'public/doctor_detail.html',
@@ -320,9 +379,9 @@ def doctor_detail(slug):
     )
 
 
-# =========================================================
-# API - Search Doctors
-# =========================================================
+# ============================================================
+# SEARCH API
+# ============================================================
 
 @public_bp.route('/api/search-doctors')
 def search_doctors():
@@ -331,7 +390,7 @@ def search_doctors():
     q = request.args.get(
         'q',
         ''
-    )
+    ).strip()
 
     results = []
 
@@ -365,7 +424,6 @@ def search_doctors():
         for doctor in doctors:
 
             results.append({
-
                 'id': doctor.id,
 
                 'name': doctor.full_name,
@@ -374,22 +432,24 @@ def search_doctors():
 
                 'slug': doctor.slug,
 
-                'specialty':
+                'specialty': (
                     doctor.specialty_ref.name_ar
                     if doctor.specialty_ref
-                    else '',
+                    else ''
+                ),
 
-                'profile_image':
+                'profile_image': (
                     doctor.profile_image
                     or '/static/images/default-avatar.jpg'
+                )
             })
 
     return jsonify(results)
 
 
-# =========================================================
-# About
-# =========================================================
+# ============================================================
+# ABOUT
+# ============================================================
 
 @public_bp.route('/about')
 def about():

@@ -8,13 +8,32 @@ class Doctor(db.Model):
     __tablename__ = 'doctors'
     __table_args__ = {'extend_existing': True}
 
-    id = db.Column(db.Integer, primary_key=True)
+    # =========================
+    # Basic information
+    # =========================
 
-    first_name = db.Column(db.String(50), nullable=False)
-    last_name = db.Column(db.String(50), nullable=False)
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
 
-    first_name_ar = db.Column(db.String(50))
-    last_name_ar = db.Column(db.String(50))
+    first_name = db.Column(
+        db.String(50),
+        nullable=False
+    )
+
+    last_name = db.Column(
+        db.String(50),
+        nullable=False
+    )
+
+    first_name_ar = db.Column(
+        db.String(50)
+    )
+
+    last_name_ar = db.Column(
+        db.String(50)
+    )
 
     slug = db.Column(
         db.String(200),
@@ -22,7 +41,9 @@ class Doctor(db.Model):
         nullable=False
     )
 
-    # Professional info
+    # =========================
+    # Professional information
+    # =========================
 
     specialty_id = db.Column(
         db.Integer,
@@ -38,10 +59,17 @@ class Doctor(db.Model):
         db.Integer
     )
 
-    bio = db.Column(db.Text)
-    bio_ar = db.Column(db.Text)
+    bio = db.Column(
+        db.Text
+    )
 
+    bio_ar = db.Column(
+        db.Text
+    )
+
+    # =========================
     # Location
+    # =========================
 
     wilaya_id = db.Column(
         db.Integer,
@@ -56,39 +84,55 @@ class Doctor(db.Model):
         nullable=True
     )
 
-    address = db.Column(db.String(500))
-    address_ar = db.Column(db.String(500))
+    address = db.Column(
+        db.String(500)
+    )
 
+    address_ar = db.Column(
+        db.String(500)
+    )
+
+    # =========================
     # Contact
+    # =========================
 
+    # رقم الهاتف تابع للطبيب وليس للعيادة
     phone = db.Column(
         db.String(20),
         nullable=False
     )
 
     phone_secondary = db.Column(
-        db.String(20)
+        db.String(20),
+        nullable=True
     )
 
     email = db.Column(
-        db.String(120)
+        db.String(120),
+        nullable=True
     )
 
-    # Clinic
+    # =========================
+    # Clinic - OPTIONAL
+    # =========================
 
     clinic_id = db.Column(
-    db.Integer,
-    db.ForeignKey('clinics.id'),
-    nullable=True
-)
+        db.Integer,
+        db.ForeignKey('clinics.id'),
+        nullable=True
+    )
 
+    # =========================
     # Media
+    # =========================
 
     profile_image = db.Column(
         db.String(200)
     )
 
+    # =========================
     # Status
+    # =========================
 
     accepts_new_patients = db.Column(
         db.Boolean,
@@ -115,7 +159,9 @@ class Doctor(db.Model):
         default=True
     )
 
+    # =========================
     # Timestamps
+    # =========================
 
     created_at = db.Column(
         db.DateTime,
@@ -128,7 +174,9 @@ class Doctor(db.Model):
         onupdate=datetime.utcnow
     )
 
+    # =========================
     # Relationships
+    # =========================
 
     services = db.relationship(
         'DoctorService',
@@ -170,6 +218,10 @@ class Doctor(db.Model):
         back_populates='doctors'
     )
 
+    # =========================
+    # Properties
+    # =========================
+
     @property
     def full_name(self):
         return f"{self.first_name} {self.last_name}".strip()
@@ -186,6 +238,10 @@ class Doctor(db.Model):
     def status(self):
         from ..services.status_service import StatusService
         return StatusService.get_status(self)
+
+    # =========================
+    # Slug
+    # =========================
 
     def generate_slug(self):
 
@@ -225,8 +281,16 @@ class Doctor(db.Model):
 
         return slug
 
+    # =========================
+    # Representation
+    # =========================
+
     def __repr__(self):
         return f'<Doctor {self.full_name}>'
+
+    # =========================
+    # Working hours
+    # =========================
 
     def get_working_hours_by_day(self):
 
@@ -236,6 +300,10 @@ class Doctor(db.Model):
             hours[wh.day_of_week] = wh
 
         return hours
+
+    # =========================
+    # Holidays
+    # =========================
 
     def get_current_holiday(self):
 
@@ -249,6 +317,10 @@ class Doctor(db.Model):
                 return holiday
 
         return None
+
+    # =========================
+    # Availability
+    # =========================
 
     def is_available_now(self):
 
