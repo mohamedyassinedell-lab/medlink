@@ -24,7 +24,7 @@ class DoctorForm(FlaskForm):
     phone_secondary = StringField('هاتف إضافي', validators=[Length(max=20)])
     email = StringField('البريد الإلكتروني', validators=[Optional(), Email(), Length(max=120)])
     
-    clinic_id = SelectField('العيادة', validators=[DataRequired()], coerce=int)
+    clinic_id = SelectField('العيادة', validators=[], coerce=int)
     
     profile_image = FileField('صورة الطبيب', validators=[FileAllowed(['jpg', 'jpeg', 'png', 'gif', 'webp'], 'الصور فقط')])
     
