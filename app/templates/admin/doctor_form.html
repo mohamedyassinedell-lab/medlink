@@ -12,280 +12,207 @@
         {{ title }}
     </h2>
 
-
     <form method="POST" enctype="multipart/form-data">
 
         {{ form.csrf_token }}
 
-
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
 
             <!-- الاسم -->
             <div>
-
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     {{ form.first_name.label }}
                 </label>
-
                 {{ form.first_name(
                     class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 ) }}
-
             </div>
 
-
             <div>
-
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     {{ form.last_name.label }}
                 </label>
-
                 {{ form.last_name(
                     class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 ) }}
-
             </div>
-
 
             <!-- الاسم بالعربية -->
             <div>
-
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     {{ form.first_name_ar.label }}
                 </label>
-
                 {{ form.first_name_ar(
                     class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 ) }}
-
             </div>
 
-
             <div>
-
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     {{ form.last_name_ar.label }}
                 </label>
-
                 {{ form.last_name_ar(
                     class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 ) }}
-
             </div>
-
 
             <!-- التخصص -->
             <div>
-
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     {{ form.specialty_id.label }}
                 </label>
-
                 {{ form.specialty_id(
                     class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 ) }}
-
             </div>
 
-
             <div>
-
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     {{ form.sub_specialty.label }}
                 </label>
-
                 {{ form.sub_specialty(
                     class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 ) }}
-
             </div>
-
 
             <!-- الخبرة -->
             <div>
-
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     {{ form.experience_years.label }}
                 </label>
-
                 {{ form.experience_years(
                     class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 ) }}
-
             </div>
-
 
             <!-- الولاية -->
             <div>
-
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     {{ form.wilaya_id.label }}
                 </label>
-
                 {{ form.wilaya_id(
                     class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 ) }}
-
             </div>
 
-
-            <!-- البلدية اختيارية -->
+            <!-- البلدية (نصية) -->
             <div>
-
                 <label class="block text-sm font-medium text-gray-700 mb-1">
-                    البلدية (اختياري)
+                    {{ form.commune_name.label }}
+                    <span class="text-xs text-gray-500 font-normal">(اختياري)</span>
                 </label>
-
-                {{ form.commune_id(
-                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                {{ form.commune_name(
+                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent",
+                    placeholder="اكتب اسم البلدية..."
                 ) }}
-
                 <p class="text-xs text-gray-500 mt-1">
-                    يمكنك ترك البلدية فارغة إذا لم تتوفر معلوماتها.
+                    اكتب اسم البلدية بالعربية أو اللاتينية
                 </p>
-
             </div>
 
+            <!-- العيادة (نصية واختيارية) -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                    {{ form.clinic_name.label }}
+                    <span class="text-xs text-gray-500 font-normal">(اختياري)</span>
+                </label>
+                {{ form.clinic_name(
+                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent",
+                    placeholder="اكتب اسم العيادة..."
+                ) }}
+                <p class="text-xs text-gray-500 mt-1">
+                    يمكنك ترك الحقل فارغاً إذا لم تكن هناك عيادة
+                </p>
+            </div>
 
             <!-- العنوان -->
             <div class="md:col-span-2">
-
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     {{ form.address.label }}
                 </label>
-
                 {{ form.address(
                     class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 ) }}
-
             </div>
 
-
             <div class="md:col-span-2">
-
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     {{ form.address_ar.label }}
                 </label>
-
                 {{ form.address_ar(
                     class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 ) }}
-
             </div>
-
 
             <!-- الهاتف -->
             <div>
-
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     {{ form.phone.label }}
                 </label>
-
                 {{ form.phone(
                     class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 ) }}
-
             </div>
 
-
             <div>
-
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     {{ form.phone_secondary.label }}
                 </label>
-
                 {{ form.phone_secondary(
                     class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 ) }}
-
             </div>
-
 
             <!-- البريد الإلكتروني -->
             <div>
-
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     {{ form.email.label }}
                 </label>
-
                 {{ form.email(
                     class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 ) }}
-
             </div>
-
-
-            <!-- العيادة -->
-            <div>
-
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                    {{ form.clinic_id.label }}
-                </label>
-
-                {{ form.clinic_id(
-                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                ) }}
-
-            </div>
-
 
             <!-- السيرة الذاتية -->
             <div class="md:col-span-2">
-
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     {{ form.bio.label }}
                 </label>
-
                 {{ form.bio(
                     class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent",
                     rows="4"
                 ) }}
-
             </div>
 
-
             <div class="md:col-span-2">
-
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     {{ form.bio_ar.label }}
                 </label>
-
                 {{ form.bio_ar(
                     class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent",
                     rows="4"
                 ) }}
-
             </div>
-
 
             <!-- الصورة -->
             <div class="md:col-span-2">
-
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     {{ form.profile_image.label }}
                 </label>
-
                 {{ form.profile_image(
                     class="w-full px-4 py-2 border border-gray-300 rounded-xl"
                 ) }}
-
                 {% if doctor and doctor.profile_image %}
-
                     <img
                         src="{{ doctor.profile_image }}"
                         alt="صورة الطبيب"
                         class="mt-2 w-24 h-24 rounded-full object-cover"
                     >
-
                 {% endif %}
-
             </div>
-
 
             <!-- الخيارات -->
             <div class="md:col-span-2 flex flex-wrap gap-6">
-
                 <label class="flex items-center gap-2 text-sm text-gray-700">
                     {{ form.accepts_new_patients }}
                     {{ form.accepts_new_patients.label }}
@@ -305,15 +232,12 @@
                     {{ form.is_published }}
                     {{ form.is_published.label }}
                 </label>
-
             </div>
 
         </div>
 
-
         <!-- الأزرار -->
         <div class="mt-6 flex gap-4">
-
             <button
                 type="submit"
                 class="px-6 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition font-semibold"
@@ -328,7 +252,6 @@
             >
                 إلغاء
             </a>
-
         </div>
 
     </form>

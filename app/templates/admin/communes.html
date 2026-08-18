@@ -1,0 +1,66 @@
+{% extends "base_admin.html" %}
+
+{% block page_title %}إدارة البلديات{% endblock %}
+
+{% block admin_content %}
+<div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">البلديات</h2>
+        <a href="{{ url_for('admin.add_commune') }}" class="px-4 py-2 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition font-semibold flex items-center gap-2">
+            <i class="fas fa-plus"></i> إضافة بلدية
+        </a>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead>
+                <tr class="border-b border-gray-200">
+                    <th class="text-right py-3 px-4 text-sm font-semibold text-gray-600">الاسم</th>
+                    <th class="text-right py-3 px-4 text-sm font-semibold text-gray-600">الاسم (عربي)</th>
+                    <th class="text-right py-3 px-4 text-sm font-semibold text-gray-600">الولاية</th>
+                    <th class="text-right py-3 px-4 text-sm font-semibold text-gray-600">الكود</th>
+                    <th class="text-right py-3 px-4 text-sm font-semibold text-gray-600">الإجراءات</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for commune in communes %}
+                    <tr class="border-b border-gray-100 hover:bg-gray-50 transition">
+                        <td class="py-3 px-4">{{ commune.name }}</td>
+                        <td class="py-3 px-4">{{ commune.name_ar }}</td>
+                        <td class="py-3 px-4">
+                            {% if commune.wilaya %}
+                                {{ commune.wilaya.name_ar }}
+                            {% elif commune.wilaya_id %}
+                                {{ commune.wilaya_id }}
+                            {% else %}
+                                <span class="text-gray-400">غير محدد</span>
+                            {% endif %}
+                        </td>
+                        <td class="py-3 px-4">{{ commune.code or '-' }}</td>
+                        <td class="py-3 px-4">
+                            <div class="flex gap-2">
+                                <a href="{{ url_for('admin.edit_commune', id=commune.id) }}" class="text-blue-600 hover:text-blue-700">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <form action="{{ url_for('admin.delete_commune', id=commune.id) }}" method="POST" onsubmit="return confirm('هل أنت متأكد من حذف هذه البلدية؟')" class="inline">
+                                    <button type="submit" class="text-red-600 hover:text-red-700">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if not communes %}
+        <div class="text-center py-12">
+            <i class="fas fa-map-pin text-6xl text-gray-300 mb-4"></i>
+            <h3 class="text-xl font-semibold text-gray-600">لا توجد بلديات</h3>
+            <p class="text-gray-500">قم بإضافة بلدية جديدة</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
