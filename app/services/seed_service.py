@@ -156,7 +156,7 @@ def seed_database():
         {
             'name': 'Dermatology',
             'name_ar': 'الأمراض الجلدية',
-            'icon': 'skin'
+            'icon': 'hand-sparkles'
         },
 
         {
@@ -168,7 +168,7 @@ def seed_database():
         {
             'name': 'Surgery',
             'name_ar': 'الجراحة',
-            'icon': 'scalpel'
+            'icon': 'scissors'
         },
 
         {
@@ -204,7 +204,7 @@ def seed_database():
         {
             'name': 'Endocrinology',
             'name_ar': 'الغدد الصماء',
-            'icon': 'gland'
+            'icon': 'droplet'
         },
 
         {
@@ -255,7 +255,7 @@ def seed_database():
             'commune_ar': 'الرويبة',
             'clinic': None,
             'clinic_ar': None,
-            'phone': '023854896'
+            'phone': None
         },
 
         {
@@ -269,7 +269,7 @@ def seed_database():
             'commune_ar': 'الرويبة',
             'clinic': None,
             'clinic_ar': None,
-            'phone': '023860014'
+            'phone': None
         },
 
         {
@@ -297,7 +297,7 @@ def seed_database():
             'commune_ar': 'الرويبة',
             'clinic': None,
             'clinic_ar': None,
-            'phone': '023715619'
+            'phone': None
         },
 
         {
@@ -441,7 +441,7 @@ def seed_database():
             'commune_ar': 'براقي',
             'clinic': None,
             'clinic_ar': None,
-            'phone': '023911488'
+            'phone': None
         },
 
         {
@@ -455,7 +455,7 @@ def seed_database():
             'commune_ar': 'بئر خادم',
             'clinic': None,
             'clinic_ar': None,
-            'phone': '023453393'
+            'phone': None
         },
 
         {
@@ -543,7 +543,7 @@ def seed_database():
             'commune_ar': 'باب الوادي',
             'clinic': None,
             'clinic_ar': None,
-            'phone': '023170081'
+            'phone': None
         },
 
         {
@@ -557,7 +557,7 @@ def seed_database():
             'commune_ar': 'خميس مليانة',
             'clinic': None,
             'clinic_ar': None,
-            'phone': '027661254'
+            'phone': None
         },
 
         {
@@ -571,7 +571,7 @@ def seed_database():
             'commune_ar': 'جيجل',
             'clinic': None,
             'clinic_ar': None,
-            'phone': '034473304'
+            'phone': None
         },
 
         {
@@ -613,7 +613,7 @@ def seed_database():
             'commune_ar': 'فريحة',
             'clinic': None,
             'clinic_ar': None,
-            'phone': '026456766'
+            'phone': None
         },
 
         {
@@ -655,7 +655,7 @@ def seed_database():
             'commune_ar': 'بوسعادة',
             'clinic': None,
             'clinic_ar': None,
-            'phone': '035433454'
+            'phone': None
         },
 
         {
@@ -683,7 +683,7 @@ def seed_database():
             'commune_ar': 'باب الوادي',
             'clinic': None,
             'clinic_ar': None,
-            'phone': '023152754'
+            'phone': None
         },
 
         {
@@ -771,7 +771,7 @@ def seed_database():
             'commune_ar': 'الأغواط',
             'clinic': None,
             'clinic_ar': None,
-            'phone': '029926590'
+            'phone': None
         },
 
         {
@@ -1013,7 +1013,7 @@ def seed_database():
             'commune_ar': 'البليدة',
             'clinic': None,
             'clinic_ar': None,
-            'phone': '025200360'
+            'phone': None
         },
 
         {
@@ -1041,7 +1041,7 @@ def seed_database():
             'commune_ar': 'بجاية',
             'clinic': None,
             'clinic_ar': None,
-            'phone': '034227118'
+            'phone': None
         },
 
         {
@@ -1069,7 +1069,7 @@ def seed_database():
             'commune_ar': 'تيزي وزو',
             'clinic': None,
             'clinic_ar': None,
-            'phone': '026119800'
+            'phone': None
         },
 
         {
@@ -1125,7 +1125,7 @@ def seed_database():
             'commune_ar': 'تلمسان',
             'clinic': None,
             'clinic_ar': None,
-            'phone': '043277382'
+            'phone': None
         },
 
         {
@@ -1455,22 +1455,7 @@ def seed_database():
         db.session.add(doctor)
         db.session.flush()
 
-        # أوقات العمل
-        existing_hours = WorkingHour.query.filter_by(
-            doctor_id=doctor.id
-        ).count()
-
-        if existing_hours == 0:
-            for day in range(7):
-                working_hour = WorkingHour(
-                    doctor_id=doctor.id,
-                    day_of_week=day,
-                    start_time='08:00',
-                    end_time='16:00',
-                    is_closed=False
-                )
-                db.session.add(working_hour)
-
+       
         added_count += 1
 
         print(
