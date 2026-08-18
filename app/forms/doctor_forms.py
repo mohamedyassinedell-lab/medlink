@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
-from wtforms import StringField, TextAreaField, IntegerField, BooleanField, SelectField
+from wtforms import StringField, TextAreaField, IntegerField, BooleanField, SelectField, DateTimeField
 from wtforms.validators import DataRequired, Email, Optional, Length, NumberRange
 
 class DoctorForm(FlaskForm):
