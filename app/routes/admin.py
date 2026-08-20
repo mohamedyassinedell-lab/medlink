@@ -161,11 +161,11 @@ def add_doctor():
             commune = get_or_create_commune(form.commune_name.data, form.wilaya_id.data)
             clinic = get_or_create_clinic(form.clinic_name.data, form.wilaya_id.data, commune.id if commune else None)
             doctor = Doctor(
-                first_name=form.first_name.data,
-                last_name=form.last_name.data,
-                first_name_ar=form.first_name_ar.data,
-                last_name_ar=form.last_name_ar.data,
-                specialty_id=form.specialty_id.data,
+                first_name=form.first_name.data or None,
+                last_name=form.last_name.data or None,
+                first_name_ar=form.first_name_ar.data or None,
+                last_name_ar=form.last_name_ar.data or None,
+                specialty_id=form.specialty_id.data or None,
                 sub_specialty=form.sub_specialty.data,
                 experience_years=form.experience_years.data,
                 bio=form.bio.data,

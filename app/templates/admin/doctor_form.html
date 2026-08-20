@@ -18,84 +18,101 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-            <!-- الاسم -->
+            <!-- ===== الاسم (اختياري) ===== -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     {{ form.first_name.label }}
+                    <span class="text-xs text-gray-500 font-normal">(اختياري)</span>
                 </label>
                 {{ form.first_name(
-                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent",
+                    placeholder="مثال: Mohamed"
                 ) }}
             </div>
 
+            <!-- ===== اللقب (اختياري) ===== -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     {{ form.last_name.label }}
+                    <span class="text-xs text-gray-500 font-normal">(اختياري)</span>
                 </label>
                 {{ form.last_name(
-                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent",
+                    placeholder="مثال: Ben Ali"
                 ) }}
             </div>
 
-            <!-- الاسم بالعربية -->
+            <!-- ===== الاسم بالعربية (اختياري) ===== -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     {{ form.first_name_ar.label }}
+                    <span class="text-xs text-gray-500 font-normal">(اختياري)</span>
                 </label>
                 {{ form.first_name_ar(
-                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent",
+                    placeholder="مثال: محمد"
                 ) }}
             </div>
 
+            <!-- ===== اللقب بالعربية (اختياري) ===== -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     {{ form.last_name_ar.label }}
+                    <span class="text-xs text-gray-500 font-normal">(اختياري)</span>
                 </label>
                 {{ form.last_name_ar(
-                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent",
+                    placeholder="مثال: بن علي"
                 ) }}
             </div>
 
-            <!-- التخصص -->
+            <!-- ===== التخصص (اختياري) ===== -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     {{ form.specialty_id.label }}
+                    <span class="text-xs text-gray-500 font-normal">(اختياري)</span>
                 </label>
                 {{ form.specialty_id(
                     class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 ) }}
             </div>
 
+            <!-- ===== التخصص الفرعي (اختياري) ===== -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     {{ form.sub_specialty.label }}
+                    <span class="text-xs text-gray-500 font-normal">(اختياري)</span>
                 </label>
                 {{ form.sub_specialty(
-                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent",
+                    placeholder="مثال: Interventional Cardiology"
                 ) }}
             </div>
 
-            <!-- الخبرة -->
+            <!-- ===== سنوات الخبرة (اختياري) ===== -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     {{ form.experience_years.label }}
+                    <span class="text-xs text-gray-500 font-normal">(اختياري)</span>
                 </label>
                 {{ form.experience_years(
-                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent",
+                    placeholder="مثال: 10"
                 ) }}
             </div>
 
-            <!-- الولاية -->
+            <!-- ===== الولاية (إجبارية) ===== -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     {{ form.wilaya_id.label }}
+                    <span class="text-xs text-red-500 font-normal">*</span>
                 </label>
                 {{ form.wilaya_id(
                     class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 ) }}
             </div>
 
-            <!-- البلدية (نصية) -->
+            <!-- ===== البلدية (نصية اختيارية) ===== -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     {{ form.commune_name.label }}
@@ -105,12 +122,10 @@
                     class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent",
                     placeholder="اكتب اسم البلدية..."
                 ) }}
-                <p class="text-xs text-gray-500 mt-1">
-                    اكتب اسم البلدية بالعربية أو اللاتينية
-                </p>
+                <p class="text-xs text-gray-500 mt-1">اكتب اسم البلدية بالعربية أو اللاتينية</p>
             </div>
 
-            <!-- العيادة (نصية واختيارية) -->
+            <!-- ===== العيادة (نصية اختيارية) ===== -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     {{ form.clinic_name.label }}
@@ -120,84 +135,98 @@
                     class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent",
                     placeholder="اكتب اسم العيادة..."
                 ) }}
-                <p class="text-xs text-gray-500 mt-1">
-                    يمكنك ترك الحقل فارغاً إذا لم تكن هناك عيادة
-                </p>
+                <p class="text-xs text-gray-500 mt-1">يمكنك ترك الحقل فارغاً إذا لم تكن هناك عيادة</p>
             </div>
 
-            <!-- العنوان -->
+            <!-- ===== العنوان (اختياري) ===== -->
             <div class="md:col-span-2">
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     {{ form.address.label }}
+                    <span class="text-xs text-gray-500 font-normal">(اختياري)</span>
                 </label>
                 {{ form.address(
-                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent",
+                    placeholder="العنوان باللاتينية"
                 ) }}
             </div>
 
             <div class="md:col-span-2">
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     {{ form.address_ar.label }}
+                    <span class="text-xs text-gray-500 font-normal">(اختياري)</span>
                 </label>
                 {{ form.address_ar(
-                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent",
+                    placeholder="العنوان بالعربية"
                 ) }}
             </div>
 
-            <!-- الهاتف -->
+            <!-- ===== الهاتف (اختياري) ===== -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     {{ form.phone.label }}
+                    <span class="text-xs text-gray-500 font-normal">(اختياري)</span>
                 </label>
                 {{ form.phone(
-                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent",
+                    placeholder="مثال: 0555123456"
                 ) }}
             </div>
 
+            <!-- ===== هاتف إضافي (اختياري) ===== -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     {{ form.phone_secondary.label }}
+                    <span class="text-xs text-gray-500 font-normal">(اختياري)</span>
                 </label>
                 {{ form.phone_secondary(
-                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent",
+                    placeholder="مثال: 0666123456"
                 ) }}
             </div>
 
-            <!-- البريد الإلكتروني -->
+            <!-- ===== البريد الإلكتروني (اختياري) ===== -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     {{ form.email.label }}
+                    <span class="text-xs text-gray-500 font-normal">(اختياري)</span>
                 </label>
                 {{ form.email(
-                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent",
+                    placeholder="مثال: doctor@example.com"
                 ) }}
             </div>
 
-            <!-- السيرة الذاتية -->
+            <!-- ===== السيرة الذاتية (اختياري) ===== -->
             <div class="md:col-span-2">
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     {{ form.bio.label }}
+                    <span class="text-xs text-gray-500 font-normal">(اختياري)</span>
                 </label>
                 {{ form.bio(
                     class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent",
-                    rows="4"
+                    rows="4",
+                    placeholder="نبذة عن الطبيب باللاتينية"
                 ) }}
             </div>
 
             <div class="md:col-span-2">
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     {{ form.bio_ar.label }}
+                    <span class="text-xs text-gray-500 font-normal">(اختياري)</span>
                 </label>
                 {{ form.bio_ar(
                     class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent",
-                    rows="4"
+                    rows="4",
+                    placeholder="نبذة عن الطبيب بالعربية"
                 ) }}
             </div>
 
-            <!-- الصورة -->
+            <!-- ===== الصورة (اختياري) ===== -->
             <div class="md:col-span-2">
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     {{ form.profile_image.label }}
+                    <span class="text-xs text-gray-500 font-normal">(اختياري)</span>
                 </label>
                 {{ form.profile_image(
                     class="w-full px-4 py-2 border border-gray-300 rounded-xl"
@@ -211,7 +240,7 @@
                 {% endif %}
             </div>
 
-            <!-- الخيارات -->
+            <!-- ===== الخيارات ===== -->
             <div class="md:col-span-2 flex flex-wrap gap-6">
                 <label class="flex items-center gap-2 text-sm text-gray-700">
                     {{ form.accepts_new_patients }}
@@ -236,7 +265,7 @@
 
         </div>
 
-        <!-- الأزرار -->
+        <!-- ===== الأزرار ===== -->
         <div class="mt-6 flex gap-4">
             <button
                 type="submit"

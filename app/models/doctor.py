@@ -13,8 +13,8 @@ class Doctor(db.Model):
     # =========================
 
     id = db.Column(db.Integer, primary_key=True)
-    first_name = db.Column(db.String(50), nullable=False)
-    last_name = db.Column(db.String(50), nullable=False)
+    first_name = db.Column(db.String(50), nullable=True)
+    last_name = db.Column(db.String(50), nullable=True)
     first_name_ar = db.Column(db.String(50))
     last_name_ar = db.Column(db.String(50))
     slug = db.Column(db.String(200), unique=True, nullable=False)
@@ -23,7 +23,7 @@ class Doctor(db.Model):
     # Professional information
     # =========================
 
-    specialty_id = db.Column(db.Integer, db.ForeignKey('specialties.id'), nullable=False)
+    specialty_id = db.Column(db.Integer, db.ForeignKey('specialties.id'), nullable=True)
     sub_specialty = db.Column(db.String(100))
     experience_years = db.Column(db.Integer)
     bio = db.Column(db.Text)
@@ -110,49 +110,31 @@ class Doctor(db.Model):
     # Slug
     # =========================
 
-    def generate_slug(self):
-        if self.first_name and self.last_name:
-            base = f"{self.first_name} {self.last_name}".lower()
-        else:
-            base = f"doctor-{self.id or 'new'}"
-
-        slug = re.sub(r'[^\w\s-]', '', base)
-        slug = re.sub(r'[-\s]+', '-', slug).strip('-')
-
-        existing = Doctor.query.filter(
-            Doctor.slug == slug,
-            Doctor.id != self.id
-        ).first()
-
-        if existing:
-            import random
-            slug = f"{slug}-{random.randint(100, 999)}"
-
-        return slug
-
-    @validates('slug')
-    def validate_slug(self, key, slug):
-        if not slug:
-            return self.generate_slug()
-        return slug
-
-    # =========================
-    # Representation
-    # =========================
-
-    def __repr__(self):
-        return f'<Doctor {self.full_name}>'
-
-    # =========================
-    # Working hours
-    # =========================
-
-    def get_working_hours_by_day(self):
-        hours = {}
-        for wh in self.working_hours.all():
-            hours[wh.day_of_week] = wh
-        return hours
-
+def generate_slug(self):
+    # إذا كان الاسم فارغاً، استخدم معرف الطبيب أو قيمة افتراضية
+    if self.first_name and self.last_name:
+        base = f"{self.first_name} {self.last_name}".lower()
+    elif self.first_name:
+        base = self.first_name.lower()
+    elif self.last_name:
+        base = self.last_name.lower()
+    else:
+        base = f"doctor-{self.id or 'new'}"
+    
+    slug = re.sub(r'[^\w\s-]', '', base)
+    slug = re.sub(r'[-\s]+', '-', slug).strip('-')
+    
+    # إذا كان slug فارغاً، استخدم قيمة افتراضية
+    if not slug:
+        slug = f"doctor-{self.id or 'new'}"
+    
+    # التحقق من عدم التكرار
+    existing = Doctor.query.filter(Doctor.slug == slug, Doctor.id != self.id).first()
+    if existing:
+        import random
+        slug = f"{slug}-{random.randint(100, 999)}"
+    
+    return slug
     # =========================
     # Holidays
     # =========================

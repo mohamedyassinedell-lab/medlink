@@ -35,7 +35,7 @@
         }
     </script>
     
-    <!-- Google Fonts - Tajawal (حديث وجميل) -->
+    <!-- Google Fonts - Tajawal -->
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
     
     <!-- Font Awesome 6 -->
@@ -44,7 +44,6 @@
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
     
-    <!-- Custom CSS -->
     <style>
         * { font-family: 'Tajawal', sans-serif; }
         .hero-gradient {
@@ -72,11 +71,21 @@
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
         ::-webkit-scrollbar-thumb { background: linear-gradient(135deg, #5b72f5, #a855f7); border-radius: 10px; }
+        
+        /* Avatar fallback */
+        .avatar-fallback {
+            background: linear-gradient(135deg, #5b72f5, #a855f7);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
     </style>
     
     {% block extra_head %}{% endblock %}
 </head>
-<body class="bg-gray-50" x-data="{ mobileMenu: false, showSearch: false }">
+<body class="bg-gray-50" x-data="{ mobileMenu: false }">
     
     <!-- ===== NAVBAR ===== -->
     <nav class="bg-white/95 backdrop-blur-md shadow-sm sticky top-0 z-50 border-b border-gray-100">
@@ -115,19 +124,13 @@
                 
                 <!-- Right Actions -->
                 <div class="flex items-center gap-3">
-                    <button @click="showSearch = !showSearch" class="p-2.5 hover:bg-gray-100 rounded-full transition">
-                        <i class="fas fa-search text-gray-600 text-lg"></i>
-                    </button>
+                    <!-- ===== تمت إزالة أيقونة البحث ===== -->
                     
+                    <!-- ===== زر لوحة التحكم للمدير فقط ===== -->
                     {% if current_user.is_authenticated and current_user.is_admin %}
                         <a href="{{ url_for('admin.dashboard') }}" class="hidden lg:inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary-500 to-purple-600 text-white rounded-xl hover:shadow-lg transition font-semibold text-sm">
                             <i class="fas fa-user-shield"></i>
                             لوحة التحكم
-                        </a>
-                    {% else %}
-                        <a href="{{ url_for('auth.login') }}" class="hidden lg:inline-flex items-center gap-2 px-5 py-2.5 border-2 border-primary-500 text-primary-600 rounded-xl hover:bg-primary-50 transition font-semibold text-sm">
-                            <i class="fas fa-user"></i>
-                            تسجيل الدخول
                         </a>
                     {% endif %}
                     
@@ -149,27 +152,12 @@
                 
                 {% if current_user.is_authenticated and current_user.is_admin %}
                     <a href="{{ url_for('admin.dashboard') }}" class="block text-center px-5 py-3 bg-gradient-to-r from-primary-500 to-purple-600 text-white rounded-xl font-semibold">لوحة التحكم</a>
-                {% else %}
-                    <a href="{{ url_for('auth.login') }}" class="block text-center px-5 py-3 border-2 border-primary-500 text-primary-600 rounded-xl font-semibold">تسجيل الدخول</a>
                 {% endif %}
             </div>
         </div>
         
-        <!-- Search Bar -->
-        <div x-show="showSearch" x-transition:enter.duration.300ms x-transition:leave.duration.300ms class="bg-white border-t border-gray-100">
-            <div class="container mx-auto px-4 py-5">
-                <form action="{{ url_for('public.doctors') }}" method="GET" class="flex flex-col md:flex-row gap-4">
-                    <div class="flex-1 relative">
-                        <input type="text" name="search" placeholder="ابحث عن طبيب، تخصص، ولاية، بلدية..." 
-                               class="w-full px-5 py-4 pr-14 bg-gray-50 border-0 rounded-2xl focus:ring-2 focus:ring-primary-500 focus:bg-white transition text-lg">
-                        <i class="fas fa-search absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 text-xl"></i>
-                    </div>
-                    <button type="submit" class="px-10 py-4 bg-gradient-to-r from-primary-500 to-purple-600 text-white rounded-2xl hover:shadow-xl transition font-bold text-lg">
-                        <i class="fas fa-search ml-2"></i> بحث
-                    </button>
-                </form>
-            </div>
-        </div>
+        <!-- ===== تمت إزالة شريط البحث المنسدل بالكامل ===== -->
+        
     </nav>
     
     <!-- ===== FLASH MESSAGES ===== -->
@@ -224,7 +212,7 @@
                 <div>
                     <h4 class="text-lg font-bold mb-4">التخصصات</h4>
                     <ul class="space-y-3 text-gray-400">
-                        {% for specialty in (specialties | default([]))[:6] %}
+                        {% for specialty in specialties[:6] %}
                             <li><a href="{{ url_for('public.doctors') }}?specialty={{ specialty.name }}" class="hover:text-white transition">{{ specialty.name_ar }}</a></li>
                         {% endfor %}
                     </ul>

@@ -27,6 +27,7 @@
             
             <!-- Search Form -->
             <form action="{{ url_for('public.doctors') }}" method="GET" class="flex flex-col md:flex-row gap-4 bg-white/10 backdrop-blur-xl rounded-3xl p-4 border border-white/20">
+                <input type="hidden" name="simple" value="1">
                 <div class="flex-1 relative">
                     <input type="text" name="search" placeholder="ابحث عن طبيب..." 
                            class="w-full px-6 py-4 pr-14 bg-white/90 backdrop-blur-sm rounded-2xl focus:ring-2 focus:ring-primary-500 focus:bg-white transition text-lg text-gray-800 placeholder:text-gray-400">
@@ -81,6 +82,7 @@
             {% endfor %}
         </div>
         
+        <!-- ===== زر عرض جميع التخصصات ===== -->
         <div class="text-center mt-10">
             <a href="{{ url_for('public.doctors') }}" class="inline-flex items-center gap-3 px-8 py-3.5 bg-gradient-to-r from-primary-500 to-purple-600 text-white rounded-2xl hover:shadow-xl transition font-bold">
                 عرض جميع التخصصات
@@ -98,6 +100,7 @@
                 <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900">أطباء متوفرون الآن</h2>
                 <p class="text-gray-500 mt-2 text-lg">اطلع على الأطباء المتاحين حالياً</p>
             </div>
+            <!-- ===== زر صغير بجانب العنوان (اختياري) ===== -->
             <a href="{{ url_for('public.doctors') }}?available_now=1" class="text-primary-600 hover:text-primary-700 font-semibold flex items-center gap-2">
                 عرض الكل <i class="fas fa-arrow-left"></i>
             </a>
@@ -107,8 +110,12 @@
             {% for doctor in doctors[:4] %}
                 <div class="bg-white rounded-2xl shadow-sm hover:shadow-2xl transition-all duration-300 overflow-hidden group hover:-translate-y-1">
                     <div class="relative h-48 bg-gradient-to-br from-primary-100 to-purple-100 flex items-center justify-center">
-                        <img src="{{ doctor.profile_image or url_for('static', filename='images/default-avatar.jpg') }}" 
-                             alt="{{ doctor.full_name }}" class="w-28 h-28 rounded-full object-cover border-4 border-white shadow-lg group-hover:scale-105 transition">
+                        {% if doctor.profile_image %}
+                            <img src="{{ doctor.profile_image }}" alt="{{ doctor.full_name }}" class="w-28 h-28 rounded-full object-cover border-4 border-white shadow-lg group-hover:scale-105 transition">
+                        {% else %}
+                            <img src="https://ui-avatars.com/api/?name={{ doctor.full_name | urlencode }}&background=6C3B8C&color=fff&size=112&bold=true" 
+                                 alt="{{ doctor.full_name }}" class="w-28 h-28 rounded-full object-cover border-4 border-white shadow-lg group-hover:scale-105 transition">
+                        {% endif %}
                         
                         {% if doctor.is_verified %}
                             <div class="absolute top-4 right-4 bg-blue-500 rounded-full p-2 shadow-lg">
@@ -125,8 +132,8 @@
                     <div class="p-5">
                         <div class="flex justify-between items-start">
                             <div>
-                                <h3 class="font-bold text-gray-800 text-lg">{{ doctor.full_name_ar }}</h3>
-                                <p class="text-sm text-primary-600 font-semibold">{{ doctor.specialty_ref.name_ar }}</p>
+                                <h3 class="font-bold text-gray-800 text-lg">{{ doctor.full_name_ar or doctor.full_name }}</h3>
+                                <p class="text-sm text-primary-600 font-semibold">{{ doctor.specialty_ref.name_ar if doctor.specialty_ref else '' }}</p>
                             </div>
                             <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold">
                                 <i class="fas fa-circle text-green-500 text-[8px] ml-1"></i>
@@ -135,8 +142,8 @@
                         </div>
                         
                         <div class="mt-3 space-y-1 text-sm text-gray-600">
-                            <p><i class="fas fa-map-marker-alt ml-2 text-primary-500 w-4"></i> {{ doctor.wilaya_ref.name_ar }}</p>
-                            <p><i class="fas fa-building ml-2 text-primary-500 w-4"></i> {{ doctor.clinic_ref.name_ar }}</p>
+                            <p><i class="fas fa-map-marker-alt ml-2 text-primary-500 w-4"></i> {{ doctor.wilaya_ref.name_ar if doctor.wilaya_ref else '' }}</p>
+                            <p><i class="fas fa-building ml-2 text-primary-500 w-4"></i> {{ doctor.clinic_ref.name_ar if doctor.clinic_ref else '' }}</p>
                         </div>
                         
                         <a href="{{ url_for('public.doctor_detail', slug=doctor.slug) }}" 
@@ -146,6 +153,16 @@
                     </div>
                 </div>
             {% endfor %}
+        </div>
+        
+        <!-- ===== زر عرض جميع الأطباء (أسفل البطاقات، بنفس نمط زر التخصصات) ===== -->
+        <div class="text-center mt-10">
+            <a href="{{ url_for('public.doctors') }}" 
+               class="inline-flex items-center gap-3 px-8 py-3.5 bg-gradient-to-r from-primary-500 to-purple-600 text-white rounded-2xl hover:shadow-xl transition font-bold text-lg">
+                <i class="fas fa-user-md ml-2"></i>
+                عرض جميع الأطباء
+                <i class="fas fa-arrow-left"></i>
+            </a>
         </div>
     </div>
 </section>
@@ -206,4 +223,5 @@
         </div>
     </div>
 </section>
+
 {% endblock %}
