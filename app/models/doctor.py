@@ -9,48 +9,48 @@ class Doctor(db.Model):
     __table_args__ = {'extend_existing': True}
 
     # =========================
-    # Basic information
+    # Basic information (OPTIONAL now)
     # =========================
 
     id = db.Column(db.Integer, primary_key=True)
-    first_name = db.Column(db.String(50), nullable=True)
-    last_name = db.Column(db.String(50), nullable=True)
+    first_name = db.Column(db.String(50), nullable=True)   # اختياري
+    last_name = db.Column(db.String(50), nullable=True)    # اختياري
     first_name_ar = db.Column(db.String(50))
     last_name_ar = db.Column(db.String(50))
     slug = db.Column(db.String(200), unique=True, nullable=False)
 
     # =========================
-    # Professional information
+    # Professional information (OPTIONAL now)
     # =========================
 
-    specialty_id = db.Column(db.Integer, db.ForeignKey('specialties.id'), nullable=True)
+    specialty_id = db.Column(db.Integer, db.ForeignKey('specialties.id'), nullable=True)  # اختياري
     sub_specialty = db.Column(db.String(100))
     experience_years = db.Column(db.Integer)
     bio = db.Column(db.Text)
     bio_ar = db.Column(db.Text)
 
     # =========================
-    # Location
+    # Location (wilaya is REQUIRED)
     # =========================
 
-    wilaya_id = db.Column(db.Integer, db.ForeignKey('wilayas.id'), nullable=False)
+    wilaya_id = db.Column(db.Integer, db.ForeignKey('wilayas.id'), nullable=False)  # إجباري
     commune_id = db.Column(db.Integer, db.ForeignKey('communes.id'), nullable=True)  # اختياري
     address = db.Column(db.String(500))
     address_ar = db.Column(db.String(500))
 
     # =========================
-    # Contact - PHONE IS NOW OPTIONAL
+    # Contact (OPTIONAL)
     # =========================
 
-    phone = db.Column(db.String(20), nullable=True)  # اختياري
+    phone = db.Column(db.String(20), nullable=True)        # اختياري
     phone_secondary = db.Column(db.String(20), nullable=True)
     email = db.Column(db.String(120), nullable=True)
 
     # =========================
-    # Clinic - OPTIONAL
+    # Clinic (OPTIONAL)
     # =========================
 
-    clinic_id = db.Column(db.Integer, db.ForeignKey('clinics.id'), nullable=True)  # اختياري
+    clinic_id = db.Column(db.Integer, db.ForeignKey('clinics.id'), nullable=True)   # اختياري
 
     # =========================
     # Media
@@ -93,12 +93,22 @@ class Doctor(db.Model):
 
     @property
     def full_name(self):
-        return f"{self.first_name} {self.last_name}".strip()
+        if self.first_name and self.last_name:
+            return f"{self.first_name} {self.last_name}".strip()
+        elif self.first_name:
+            return self.first_name
+        elif self.last_name:
+            return self.last_name
+        return "طبيب"
 
     @property
     def full_name_ar(self):
         if self.first_name_ar and self.last_name_ar:
             return f"{self.first_name_ar} {self.last_name_ar}".strip()
+        elif self.first_name_ar:
+            return self.first_name_ar
+        elif self.last_name_ar:
+            return self.last_name_ar
         return self.full_name
 
     @property
@@ -107,34 +117,62 @@ class Doctor(db.Model):
         return StatusService.get_status(self)
 
     # =========================
-    # Slug
+    # Slug - FIXED
     # =========================
 
-def generate_slug(self):
-    # إذا كان الاسم فارغاً، استخدم معرف الطبيب أو قيمة افتراضية
-    if self.first_name and self.last_name:
-        base = f"{self.first_name} {self.last_name}".lower()
-    elif self.first_name:
-        base = self.first_name.lower()
-    elif self.last_name:
-        base = self.last_name.lower()
-    else:
-        base = f"doctor-{self.id or 'new'}"
-    
-    slug = re.sub(r'[^\w\s-]', '', base)
-    slug = re.sub(r'[-\s]+', '-', slug).strip('-')
-    
-    # إذا كان slug فارغاً، استخدم قيمة افتراضية
-    if not slug:
-        slug = f"doctor-{self.id or 'new'}"
-    
-    # التحقق من عدم التكرار
-    existing = Doctor.query.filter(Doctor.slug == slug, Doctor.id != self.id).first()
-    if existing:
-        import random
-        slug = f"{slug}-{random.randint(100, 999)}"
-    
-    return slug
+    def generate_slug(self):
+        """إنشاء slug فريد بناءً على الاسم أو معرف مؤقت"""
+        # 1. محاولة بناء slug من الأسماء
+        if self.first_name and self.last_name:
+            base = f"{self.first_name} {self.last_name}".lower()
+        elif self.first_name:
+            base = self.first_name.lower()
+        elif self.last_name:
+            base = self.last_name.lower()
+        else:
+            # 2. إذا لم يكن هناك اسم، استخدم معرفًا مؤقتًا
+            base = f"doctor-{self.id or 'new'}"
+
+        # 3. تنظيف النص (إزالة الأحرف غير المسموحة)
+        import re
+        slug = re.sub(r'[^\w\s-]', '', base)
+        slug = re.sub(r'[-\s]+', '-', slug).strip('-')
+
+        # 4. إذا أصبح slug فارغًا، استخدم قيمة افتراضية
+        if not slug:
+            slug = f"doctor-{self.id or 'new'}"
+
+        # 5. التأكد من أن slug فريد (إضافة رقم عشوائي إذا كان موجودًا)
+        existing = Doctor.query.filter(Doctor.slug == slug, Doctor.id != self.id).first()
+        if existing:
+            import random
+            slug = f"{slug}-{random.randint(100, 999)}"
+
+        return slug
+
+    @validates('slug')
+    def validate_slug(self, key, slug):
+        if not slug:
+            return self.generate_slug()
+        return slug
+
+    # =========================
+    # Representation
+    # =========================
+
+    def __repr__(self):
+        return f'<Doctor {self.full_name}>'
+
+    # =========================
+    # Working hours
+    # =========================
+
+    def get_working_hours_by_day(self):
+        hours = {}
+        for wh in self.working_hours.all():
+            hours[wh.day_of_week] = wh
+        return hours
+
     # =========================
     # Holidays
     # =========================
