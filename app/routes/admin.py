@@ -36,22 +36,36 @@ admin_bp = Blueprint('admin', __name__)
 # ============================================================
 
 def get_or_create_commune(name, wilaya_id):
+    """ابحث عن بلدية أو أنشئها إذا لم تكن موجودة"""
     if not name or not name.strip():
         return None
+
     name = name.strip()
+
     commune = Commune.query.filter(
         (Commune.name == name) | (Commune.name_ar == name),
         Commune.wilaya_id == wilaya_id
     ).first()
+
     if not commune:
         if re.search(r'[أ-ي]', name):
-            commune = Commune(name=name, name_ar=name, wilaya_id=wilaya_id)
+            commune = Commune(
+                name=name,
+                name_ar=name,
+                wilaya_id=wilaya_id,
+                code=''  # <--- إضافة قيمة افتراضية لتجنب NULL
+            )
         else:
-            commune = Commune(name=name, name_ar=name, wilaya_id=wilaya_id)
+            commune = Commune(
+                name=name,
+                name_ar=name,
+                wilaya_id=wilaya_id,
+                code=''  # <--- إضافة قيمة افتراضية لتجنب NULL
+            )
         db.session.add(commune)
         db.session.flush()
-    return commune
 
+    return commune
 
 def get_or_create_clinic(name, wilaya_id, commune_id=None):
     if not name or not name.strip():

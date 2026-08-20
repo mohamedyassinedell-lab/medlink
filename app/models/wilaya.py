@@ -79,8 +79,10 @@ class Commune(db.Model):
         nullable=False
     )
 
+    # ===== تم التعديل: جعل code اختيارياً =====
     code = db.Column(
-        db.String(10)
+        db.String(10),
+        nullable=True   # <--- تغيير من False إلى True
     )
 
     # الأطباء
