@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, jsonify, flash, redirect, url_for
+from flask import Blueprint, render_template, request, jsonify, flash, redirect, url_for, send_from_directory, current_app
 from ..extensions import db
 from ..models import (
     Doctor,
@@ -416,3 +416,13 @@ def sitemap():
     pretty_xml = reparsed.toprettyxml(indent="  ")
     
     return pretty_xml, 200, {'Content-Type': 'application/xml'}
+
+
+# ============================================================
+# GOOGLE VERIFICATION FILE
+# ============================================================
+
+@public_bp.route('/google57c881331ae6cd7c.html')
+def google_verification():
+    """Serve Google Search Console verification file"""
+    return send_from_directory('static', 'google57c881331ae6cd7c.html')
