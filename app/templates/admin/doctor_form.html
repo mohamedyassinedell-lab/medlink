@@ -16,6 +16,19 @@
 
         {{ form.csrf_token }}
 
+        <!-- ===== عرض أخطاء النموذج ===== -->
+        {% if form.errors %}
+            <div class="bg-red-50 border border-red-200 text-red-800 p-4 rounded-xl mb-6">
+                <ul class="list-disc pr-5">
+                    {% for field, errors in form.errors.items() %}
+                        {% for error in errors %}
+                            <li>{{ field }}: {{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
             <!-- ===== الاسم (اختياري) ===== -->
@@ -26,6 +39,7 @@
                 </label>
                 {{ form.first_name(
                     class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent",
+                    required=False,
                     placeholder="مثال: Mohamed"
                 ) }}
             </div>
@@ -38,11 +52,12 @@
                 </label>
                 {{ form.last_name(
                     class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent",
+                    required=False,
                     placeholder="مثال: Ben Ali"
                 ) }}
             </div>
 
-            <!-- ===== الاسم بالعربية (اختياري) ===== -->
+            <!-- ===== الاسم (عربي) اختياري ===== -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     {{ form.first_name_ar.label }}
@@ -54,7 +69,7 @@
                 ) }}
             </div>
 
-            <!-- ===== اللقب بالعربية (اختياري) ===== -->
+            <!-- ===== اللقب (عربي) اختياري ===== -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     {{ form.last_name_ar.label }}
@@ -84,8 +99,7 @@
                     <span class="text-xs text-gray-500 font-normal">(اختياري)</span>
                 </label>
                 {{ form.sub_specialty(
-                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent",
-                    placeholder="مثال: Interventional Cardiology"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 ) }}
             </div>
 
@@ -96,12 +110,11 @@
                     <span class="text-xs text-gray-500 font-normal">(اختياري)</span>
                 </label>
                 {{ form.experience_years(
-                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent",
-                    placeholder="مثال: 10"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 ) }}
             </div>
 
-            <!-- ===== الولاية (إجبارية) ===== -->
+            <!-- ===== الولاية (إجباري) ===== -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     {{ form.wilaya_id.label }}
@@ -112,7 +125,7 @@
                 ) }}
             </div>
 
-            <!-- ===== البلدية (نصية اختيارية) ===== -->
+            <!-- ===== البلدية (نصية اختياري) ===== -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     {{ form.commune_name.label }}
@@ -122,10 +135,9 @@
                     class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent",
                     placeholder="اكتب اسم البلدية..."
                 ) }}
-                <p class="text-xs text-gray-500 mt-1">اكتب اسم البلدية بالعربية أو اللاتينية</p>
             </div>
 
-            <!-- ===== العيادة (نصية اختيارية) ===== -->
+            <!-- ===== العيادة (نصية اختياري) ===== -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     {{ form.clinic_name.label }}
@@ -135,7 +147,6 @@
                     class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent",
                     placeholder="اكتب اسم العيادة..."
                 ) }}
-                <p class="text-xs text-gray-500 mt-1">يمكنك ترك الحقل فارغاً إذا لم تكن هناك عيادة</p>
             </div>
 
             <!-- ===== العنوان (اختياري) ===== -->
@@ -145,8 +156,7 @@
                     <span class="text-xs text-gray-500 font-normal">(اختياري)</span>
                 </label>
                 {{ form.address(
-                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent",
-                    placeholder="العنوان باللاتينية"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 ) }}
             </div>
 
@@ -156,8 +166,7 @@
                     <span class="text-xs text-gray-500 font-normal">(اختياري)</span>
                 </label>
                 {{ form.address_ar(
-                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent",
-                    placeholder="العنوان بالعربية"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 ) }}
             </div>
 
@@ -168,20 +177,17 @@
                     <span class="text-xs text-gray-500 font-normal">(اختياري)</span>
                 </label>
                 {{ form.phone(
-                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent",
-                    placeholder="مثال: 0555123456"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 ) }}
             </div>
 
-            <!-- ===== هاتف إضافي (اختياري) ===== -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     {{ form.phone_secondary.label }}
                     <span class="text-xs text-gray-500 font-normal">(اختياري)</span>
                 </label>
                 {{ form.phone_secondary(
-                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent",
-                    placeholder="مثال: 0666123456"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 ) }}
             </div>
 
@@ -192,8 +198,7 @@
                     <span class="text-xs text-gray-500 font-normal">(اختياري)</span>
                 </label>
                 {{ form.email(
-                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent",
-                    placeholder="مثال: doctor@example.com"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 ) }}
             </div>
 
@@ -205,8 +210,7 @@
                 </label>
                 {{ form.bio(
                     class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent",
-                    rows="4",
-                    placeholder="نبذة عن الطبيب باللاتينية"
+                    rows="4"
                 ) }}
             </div>
 
@@ -217,12 +221,11 @@
                 </label>
                 {{ form.bio_ar(
                     class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent",
-                    rows="4",
-                    placeholder="نبذة عن الطبيب بالعربية"
+                    rows="4"
                 ) }}
             </div>
 
-            <!-- ===== الصورة (اختياري) ===== -->
+            <!-- ===== الصورة (مع التصحيح) ===== -->
             <div class="md:col-span-2">
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     {{ form.profile_image.label }}
