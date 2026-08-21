@@ -1,30 +1,77 @@
 from flask import Blueprint, render_template, request, jsonify, flash, redirect, url_for
 from ..extensions import db
-from ..models import Doctor, Specialty, Wilaya, Commune, Clinic, Service, Report
+from ..models import (
+    Doctor,
+    Specialty,
+    Wilaya,
+    Commune,
+    Clinic,
+    Service,
+    Report
+)
 from ..services.status_service import StatusService
 from sqlalchemy import or_
+from xml.etree.ElementTree import Element, SubElement, tostring
+from xml.dom import minidom
+
 
 public_bp = Blueprint('public', __name__)
 
 
+# ============================================================
+# PUBLIC CONTEXT
+# ============================================================
+
 @public_bp.context_processor
 def inject_public_data():
+    """
+    Variables available automatically in all public templates.
+    This prevents 'specialties is undefined' errors in base.html.
+    """
     try:
-        specialties = Specialty.query.filter_by(is_active=True).all()
+        specialties = Specialty.query.filter_by(
+            is_active=True
+        ).all()
     except Exception:
         specialties = []
-    return {'specialties': specialties}
 
+    return {
+        'specialties': specialties
+    }
+
+
+# ============================================================
+# HOME
+# ============================================================
 
 @public_bp.route('/')
 def index():
-    doctors = Doctor.query.filter_by(is_published=True, is_active=True).limit(8).all()
-    specialties = Specialty.query.filter_by(is_active=True).all()
+    """Homepage"""
+
+    doctors = Doctor.query.filter_by(
+        is_published=True,
+        is_active=True
+    ).limit(8).all()
+
+    specialties = Specialty.query.filter_by(
+        is_active=True
+    ).all()
+
     wilayas = Wilaya.query.all()
 
-    doctor_count = Doctor.query.filter_by(is_published=True, is_active=True).count()
-    clinic_count = Clinic.query.filter_by(is_active=True).count()
-    specialty_count = Specialty.query.filter_by(is_active=True).count()
+    doctor_count = Doctor.query.filter_by(
+        is_published=True,
+        is_active=True
+    ).count()
+
+    clinic_count = Clinic.query.filter_by(
+        is_active=True
+    ).count()
+
+    specialty_count = Specialty.query.filter_by(
+        is_active=True
+    ).count()
+
     wilaya_count = Wilaya.query.count()
 
     return render_template(
@@ -39,30 +86,61 @@ def index():
     )
 
 
+# ============================================================
+# DOCTORS LIST
+# ============================================================
+
 @public_bp.route('/doctors')
 def doctors():
+    """List all doctors with filters"""
+
     page = request.args.get('page', 1, type=int)
     per_page = 12
 
-    query = Doctor.query.filter_by(is_published=True, is_active=True)
+    query = Doctor.query.filter_by(
+        is_published=True,
+        is_active=True
+    )
 
+    # Filters
     search = request.args.get('search', '').strip()
     specialty = request.args.get('specialty', '').strip()
     wilaya = request.args.get('wilaya', '').strip()
     commune = request.args.get('commune', '').strip()
     accepts_new = request.args.get('accepts_new', '')
+    simple_mode = request.args.get('simple', '0') == '1'
 
     if search:
-        terms = search.split()
-        for term in terms:
-            query = query.filter(
-                or_(
-                    Doctor.first_name.ilike(f'%{term}%'),
-                    Doctor.last_name.ilike(f'%{term}%'),
-                    Doctor.first_name_ar.ilike(f'%{term}%'),
-                    Doctor.last_name_ar.ilike(f'%{term}%')
+        if simple_mode:
+            # البحث فقط في اسم الطبيب (من الصفحة الرئيسية)
+            terms = search.split()
+            for term in terms:
+                query = query.filter(
+                    or_(
+                        Doctor.first_name.ilike(f'%{term}%'),
+                        Doctor.last_name.ilike(f'%{term}%'),
+                        Doctor.first_name_ar.ilike(f'%{term}%'),
+                        Doctor.last_name_ar.ilike(f'%{term}%')
+                    )
                 )
-            )
+        else:
+            # البحث الكامل (من صفحة الأطباء)
+            terms = search.split()
+            for term in terms:
+                query = query.filter(
+                    or_(
+                        Doctor.first_name.ilike(f'%{term}%'),
+                        Doctor.last_name.ilike(f'%{term}%'),
+                        Doctor.first_name_ar.ilike(f'%{term}%'),
+                        Doctor.last_name_ar.ilike(f'%{term}%'),
+                        Specialty.name.ilike(f'%{term}%'),
+                        Specialty.name_ar.ilike(f'%{term}%'),
+                        Wilaya.name.ilike(f'%{term}%'),
+                        Wilaya.name_ar.ilike(f'%{term}%'),
+                        Commune.name.ilike(f'%{term}%'),
+                        Commune.name_ar.ilike(f'%{term}%')
+                    )
+                )
 
     if specialty:
         query = query.join(Specialty).filter(
@@ -91,12 +169,23 @@ def doctors():
     if accepts_new == '1':
         query = query.filter(Doctor.accepts_new_patients == True)
 
-    query = query.order_by(Doctor.is_featured.desc(), Doctor.created_at.desc())
+    query = query.order_by(
+        Doctor.is_featured.desc(),
+        Doctor.created_at.desc()
+    )
 
-    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+    pagination = query.paginate(
+        page=page,
+        per_page=per_page,
+        error_out=False
+    )
+
     doctors_list = pagination.items
 
-    specialties = Specialty.query.filter_by(is_active=True).all()
+    specialties = Specialty.query.filter_by(
+        is_active=True
+    ).all()
+
     wilayas = Wilaya.query.all()
 
     return render_template(
@@ -111,13 +200,20 @@ def doctors():
     )
 
 
+# ============================================================
+# DOCTOR DETAIL
+# ============================================================
+
 @public_bp.route('/doctors/<slug>')
 def doctor_detail(slug):
-    try:
-        doctor = Doctor.query.filter_by(slug=slug, is_published=True).first_or_404()
-    except Exception:
-        flash('الطبيب غير موجود', 'danger')
-        return redirect(url_for('public.index'))
+    """
+    Public doctor profile.
+    """
+
+    doctor = Doctor.query.filter_by(
+        slug=slug,
+        is_published=True
+    ).first_or_404()
 
     try:
         services = doctor.services.all()
@@ -133,11 +229,23 @@ def doctor_detail(slug):
         try:
             status = StatusService.get_status(doctor)
         except Exception:
-            status = {'status': 'UNKNOWN', 'label': 'ℹ️', 'message': 'المعلومات غير متوفرة', 'return_date': None}
+            status = {
+                'status': 'UNKNOWN',
+                'label': 'ℹ️',
+                'message': 'المعلومات غير متوفرة',
+                'return_date': None
+            }
     else:
-        status = {'status': 'UNKNOWN', 'label': 'ℹ️', 'message': 'أوقات العمل غير متوفرة', 'return_date': None}
+        status = {
+            'status': 'UNKNOWN',
+            'label': 'ℹ️',
+            'message': 'أوقات العمل غير متوفرة',
+            'return_date': None
+        }
 
-    specialties = Specialty.query.filter_by(is_active=True).all()
+    specialties = Specialty.query.filter_by(
+        is_active=True
+    ).all()
 
     return render_template(
         'public/doctor_detail.html',
@@ -149,8 +257,13 @@ def doctor_detail(slug):
     )
 
 
+# ============================================================
+# REPORT DOCTOR
+# ============================================================
+
 @public_bp.route('/report-doctor/<slug>', methods=['POST'])
 def report_doctor(slug):
+    """Handle doctor report submission"""
     doctor = Doctor.query.filter_by(slug=slug, is_published=True).first_or_404()
 
     issue_type = request.form.get('issue_type')
@@ -180,12 +293,19 @@ def report_doctor(slug):
     return redirect(url_for('public.doctor_detail', slug=slug))
 
 
+# ============================================================
+# SEARCH API
+# ============================================================
+
 @public_bp.route('/api/search-doctors')
 def search_doctors():
+    """API endpoint for doctor search"""
+
     q = request.args.get('q', '').strip()
     results = []
 
     if len(q) >= 2:
+
         doctors = Doctor.query.filter(
             or_(
                 Doctor.first_name.ilike(f'%{q}%'),
@@ -198,18 +318,101 @@ def search_doctors():
         ).limit(5).all()
 
         for doctor in doctors:
+
             results.append({
                 'id': doctor.id,
                 'name': doctor.full_name,
                 'name_ar': doctor.full_name_ar,
                 'slug': doctor.slug,
-                'specialty': doctor.specialty_ref.name_ar if doctor.specialty_ref else '',
-                'profile_image': doctor.profile_image or '/static/images/default-avatar.jpg'
+                'specialty': (
+                    doctor.specialty_ref.name_ar
+                    if doctor.specialty_ref
+                    else ''
+                ),
+                'profile_image': (
+                    doctor.profile_image
+                    or '/static/images/default-avatar.jpg'
+                )
             })
 
     return jsonify(results)
 
 
+# ============================================================
+# ABOUT
+# ============================================================
+
 @public_bp.route('/about')
 def about():
-    return render_template('public/about.html')
+    """About page"""
+
+    return render_template(
+        'public/about.html'
+    )
+
+
+# ============================================================
+# SITEMAP.XML (SEO)
+# ============================================================
+
+@public_bp.route('/sitemap.xml')
+def sitemap():
+    """Generate sitemap.xml dynamically for SEO"""
+    
+    urlset = Element('urlset')
+    urlset.set('xmlns', 'http://www.sitemaps.org/schemas/sitemap/0.9')
+    
+    # الصفحة الرئيسية
+    url = SubElement(urlset, 'url')
+    loc = SubElement(url, 'loc')
+    loc.text = request.url_root
+    priority = SubElement(url, 'priority')
+    priority.text = '1.0'
+    
+    # صفحة الأطباء
+    url = SubElement(urlset, 'url')
+    loc = SubElement(url, 'loc')
+    loc.text = request.url_root + 'doctors'
+    priority = SubElement(url, 'priority')
+    priority.text = '0.8'
+    
+    # صفحة من نحن
+    url = SubElement(urlset, 'url')
+    loc = SubElement(url, 'loc')
+    loc.text = request.url_root + 'about'
+    priority = SubElement(url, 'priority')
+    priority.text = '0.5'
+    
+    # الأطباء المنشورون
+    doctors = Doctor.query.filter_by(is_published=True, is_active=True).all()
+    for doctor in doctors:
+        url = SubElement(urlset, 'url')
+        loc = SubElement(url, 'loc')
+        loc.text = request.url_root + 'doctors/' + doctor.slug
+        priority = SubElement(url, 'priority')
+        priority.text = '0.7'
+    
+    # التخصصات النشطة
+    specialties = Specialty.query.filter_by(is_active=True).all()
+    for specialty in specialties:
+        url = SubElement(urlset, 'url')
+        loc = SubElement(url, 'loc')
+        loc.text = request.url_root + 'doctors?specialty=' + specialty.name
+        priority = SubElement(url, 'priority')
+        priority.text = '0.6'
+    
+    # الولايات
+    wilayas = Wilaya.query.all()
+    for wilaya in wilayas:
+        url = SubElement(urlset, 'url')
+        loc = SubElement(url, 'loc')
+        loc.text = request.url_root + 'doctors?wilaya=' + wilaya.name
+        priority = SubElement(url, 'priority')
+        priority.text = '0.6'
+    
+    # تحويل إلى XML
+    rough_string = tostring(urlset, 'utf-8')
+    reparsed = minidom.parseString(rough_string)
+    pretty_xml = reparsed.toprettyxml(indent="  ")
+    
+    return pretty_xml, 200, {'Content-Type': 'application/xml'}
