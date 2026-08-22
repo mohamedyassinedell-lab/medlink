@@ -419,6 +419,16 @@ def sitemap():
 
 
 # ============================================================
+# ROBOTS.TXT
+# ============================================================
+
+@public_bp.route('/robots.txt')
+def robots_txt():
+    """Serve robots.txt file"""
+    return send_from_directory('static', 'robots.txt')
+
+
+# ============================================================
 # GOOGLE VERIFICATION FILE
 # ============================================================
 
@@ -426,3 +436,13 @@ def sitemap():
 def google_verification():
     """Serve Google Search Console verification file"""
     return send_from_directory('static', 'google57c881331ae6cd7c.html')
+
+
+# ============================================================
+# STATIC FILES (Fallback)
+# ============================================================
+
+@public_bp.route('/static/<path:filename>')
+def static_files(filename):
+    """Serve static files"""
+    return send_from_directory('static', filename)
