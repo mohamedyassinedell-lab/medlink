@@ -9,32 +9,32 @@ class Doctor(db.Model):
     __table_args__ = {'extend_existing': True}
 
     # =========================
-    # Basic information (OPTIONAL now)
+    # Basic information (OPTIONAL)
     # =========================
 
     id = db.Column(db.Integer, primary_key=True)
-    first_name = db.Column(db.String(50), nullable=True)   # اختياري
-    last_name = db.Column(db.String(50), nullable=True)    # اختياري
+    first_name = db.Column(db.String(50), nullable=True)
+    last_name = db.Column(db.String(50), nullable=True)
     first_name_ar = db.Column(db.String(50))
     last_name_ar = db.Column(db.String(50))
     slug = db.Column(db.String(200), unique=True, nullable=False)
 
     # =========================
-    # Professional information (OPTIONAL now)
+    # Professional information (OPTIONAL)
     # =========================
 
-    specialty_id = db.Column(db.Integer, db.ForeignKey('specialties.id'), nullable=True)  # اختياري
+    specialty_id = db.Column(db.Integer, db.ForeignKey('specialties.id'), nullable=True)
     sub_specialty = db.Column(db.String(100))
     experience_years = db.Column(db.Integer)
     bio = db.Column(db.Text)
     bio_ar = db.Column(db.Text)
 
     # =========================
-    # Location (wilaya is REQUIRED)
+    # Location
     # =========================
 
-    wilaya_id = db.Column(db.Integer, db.ForeignKey('wilayas.id'), nullable=False)  # إجباري
-    commune_id = db.Column(db.Integer, db.ForeignKey('communes.id'), nullable=True)  # اختياري
+    wilaya_id = db.Column(db.Integer, db.ForeignKey('wilayas.id'), nullable=False)
+    commune_id = db.Column(db.Integer, db.ForeignKey('communes.id'), nullable=True)
     address = db.Column(db.String(500))
     address_ar = db.Column(db.String(500))
 
@@ -42,7 +42,7 @@ class Doctor(db.Model):
     # Contact (OPTIONAL)
     # =========================
 
-    phone = db.Column(db.String(20), nullable=True)        # اختياري
+    phone = db.Column(db.String(20), nullable=True)
     phone_secondary = db.Column(db.String(20), nullable=True)
     email = db.Column(db.String(120), nullable=True)
 
@@ -50,7 +50,7 @@ class Doctor(db.Model):
     # Clinic (OPTIONAL)
     # =========================
 
-    clinic_id = db.Column(db.Integer, db.ForeignKey('clinics.id'), nullable=True)   # اختياري
+    clinic_id = db.Column(db.Integer, db.ForeignKey('clinics.id'), nullable=True)
 
     # =========================
     # Media
@@ -69,6 +69,13 @@ class Doctor(db.Model):
     is_active = db.Column(db.Boolean, default=True)
 
     # =========================
+    # Approval System (جديد)
+    # =========================
+
+    is_approved = db.Column(db.Boolean, default=False)
+    submitted_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+
+    # =========================
     # Timestamps
     # =========================
 
@@ -79,13 +86,45 @@ class Doctor(db.Model):
     # Relationships
     # =========================
 
-    services = db.relationship('DoctorService', backref='doctor', lazy='dynamic', cascade='all, delete-orphan')
-    working_hours = db.relationship('WorkingHour', backref='doctor', lazy='dynamic', cascade='all, delete-orphan')
-    holidays = db.relationship('Holiday', backref='doctor', lazy='dynamic', cascade='all, delete-orphan')
-    reports = db.relationship('Report', backref='doctor', lazy='dynamic', cascade='all, delete-orphan')
+    services = db.relationship(
+        'DoctorService',
+        backref='doctor',
+        lazy='dynamic',
+        cascade='all, delete-orphan'
+    )
 
-    specialty_ref = db.relationship('Specialty', foreign_keys=[specialty_id], back_populates='doctors')
-    clinic_ref = db.relationship('Clinic', foreign_keys=[clinic_id], back_populates='doctors')
+    working_hours = db.relationship(
+        'WorkingHour',
+        backref='doctor',
+        lazy='dynamic',
+        cascade='all, delete-orphan'
+    )
+
+    holidays = db.relationship(
+        'Holiday',
+        backref='doctor',
+        lazy='dynamic',
+        cascade='all, delete-orphan'
+    )
+
+    reports = db.relationship(
+        'Report',
+        backref='doctor',
+        lazy='dynamic',
+        cascade='all, delete-orphan'
+    )
+
+    specialty_ref = db.relationship(
+        'Specialty',
+        foreign_keys=[specialty_id],
+        back_populates='doctors'
+    )
+
+    clinic_ref = db.relationship(
+        'Clinic',
+        foreign_keys=[clinic_id],
+        back_populates='doctors'
+    )
 
     # =========================
     # Properties
@@ -117,12 +156,10 @@ class Doctor(db.Model):
         return StatusService.get_status(self)
 
     # =========================
-    # Slug - FIXED
+    # Slug
     # =========================
 
     def generate_slug(self):
-        """إنشاء slug فريد بناءً على الاسم أو معرف مؤقت"""
-        # 1. محاولة بناء slug من الأسماء
         if self.first_name and self.last_name:
             base = f"{self.first_name} {self.last_name}".lower()
         elif self.first_name:
@@ -130,19 +167,14 @@ class Doctor(db.Model):
         elif self.last_name:
             base = self.last_name.lower()
         else:
-            # 2. إذا لم يكن هناك اسم، استخدم معرفًا مؤقتًا
             base = f"doctor-{self.id or 'new'}"
 
-        # 3. تنظيف النص (إزالة الأحرف غير المسموحة)
-        import re
         slug = re.sub(r'[^\w\s-]', '', base)
         slug = re.sub(r'[-\s]+', '-', slug).strip('-')
 
-        # 4. إذا أصبح slug فارغًا، استخدم قيمة افتراضية
         if not slug:
             slug = f"doctor-{self.id or 'new'}"
 
-        # 5. التأكد من أن slug فريد (إضافة رقم عشوائي إذا كان موجودًا)
         existing = Doctor.query.filter(Doctor.slug == slug, Doctor.id != self.id).first()
         if existing:
             import random
