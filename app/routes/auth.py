@@ -7,12 +7,15 @@ from datetime import datetime
 
 auth_bp = Blueprint('auth', __name__)
 
+
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
+    """صفحة تسجيل الدخول"""
     if current_user.is_authenticated:
+        next_page = request.args.get('next')
         if current_user.is_admin:
-            return redirect(url_for('admin.dashboard'))
-        return redirect(url_for('user.dashboard'))
+            return redirect(next_page or url_for('admin.dashboard'))
+        return redirect(next_page or url_for('user.dashboard'))
     
     form = LoginForm()
     if form.validate_on_submit():
@@ -35,8 +38,13 @@ def login():
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
+    """صفحة إنشاء حساب جديد"""
+    # إذا كان المستخدم مسجل دخول بالفعل
     if current_user.is_authenticated:
-        return redirect(url_for('public.index'))
+        next_page = request.args.get('next')
+        if current_user.is_admin:
+            return redirect(next_page or url_for('admin.dashboard'))
+        return redirect(next_page or url_for('user.dashboard'))
     
     form = RegistrationForm()
     if form.validate_on_submit():
@@ -45,6 +53,7 @@ def register():
             flash('البريد الإلكتروني مستخدم مسبقاً', 'danger')
             return render_template('auth/register.html', form=form)
         
+        # التحقق من عدم وجود اسم المستخدم
         if User.query.filter_by(username=form.username.data).first():
             flash('اسم المستخدم مستخدم مسبقاً', 'danger')
             return render_template('auth/register.html', form=form)
@@ -60,8 +69,14 @@ def register():
         db.session.add(user)
         db.session.commit()
         
-        flash('تم إنشاء حسابك بنجاح! يمكنك تسجيل الدخول الآن', 'success')
-        return redirect(url_for('auth.login'))
+        # ✅ تسجيل الدخول تلقائياً بعد التسجيل
+        login_user(user)
+        
+        flash('🎉 تم إنشاء حسابك بنجاح! مرحباً بك في TebGuide', 'success')
+        
+        # ✅ التوجيه إلى next إذا كان موجوداً
+        next_page = request.args.get('next')
+        return redirect(next_page or url_for('user.dashboard'))
     
     return render_template('auth/register.html', form=form)
 
@@ -69,6 +84,7 @@ def register():
 @auth_bp.route('/logout')
 @login_required
 def logout():
+    """تسجيل الخروج"""
     logout_user()
     flash('تم تسجيل الخروج بنجاح', 'info')
     return redirect(url_for('public.index'))

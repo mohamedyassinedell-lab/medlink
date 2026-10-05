@@ -6,7 +6,7 @@
     <title>{% block title %}{{ get_platform_setting('platform_name') }}{% endblock %}</title>
     <meta name="description" content="{% block description %}{{ get_platform_setting('platform_description') }}{% endblock %}">
     
-    <!-- ===== Google Search Console Verification ===== -->
+    <!-- Google Search Console Verification -->
     <meta name="google-site-verification" content="google57c881331ae6cd7c" />
 
     <!-- Tailwind CSS -->
@@ -17,73 +17,30 @@
                 extend: {
                     colors: {
                         primary: {
-                            50: '#f0f4ff',
-                            100: '#e0e9ff', 
-                            200: '#c7d7fe',
-                            300: '#a5b9fc',
-                            400: '#7e94fa',
-                            500: '#5b72f5',
-                            600: '#3d53e8',
-                            700: '#2f42c4',
-                            800: '#27369a',
-                            900: '#1d2866',
-                            950: '#12183f',
+                            50: '#f0f4ff', 100: '#e0e9ff', 200: '#c7d7fe',
+                            300: '#a5b9fc', 400: '#7e94fa', 500: '#5b72f5',
+                            600: '#3d53e8', 700: '#2f42c4', 800: '#27369a',
+                            900: '#1d2866', 950: '#12183f',
                         }
                     },
-                    fontFamily: {
-                        arabic: ['"Tajawal"', 'sans-serif'],
-                    }
+                    fontFamily: { arabic: ['"Tajawal"', 'sans-serif'] }
                 }
             }
         }
     </script>
     
-    <!-- Google Fonts - Tajawal -->
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
-    
-    <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    
-    <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
     
     <style>
         * { font-family: 'Tajawal', sans-serif; }
-        .hero-gradient {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-        }
-        .glass-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-        }
-        .hover-lift {
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
-        }
-        .hover-lift:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 20px 40px -12px rgba(0,0,0,0.25);
-        }
-        .gradient-text {
-            background: linear-gradient(135deg, #5b72f5, #a855f7);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
+        .hero-gradient { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); }
+        .glass-card { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.15); }
+        .gradient-text { background: linear-gradient(135deg, #5b72f5, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
         ::-webkit-scrollbar-thumb { background: linear-gradient(135deg, #5b72f5, #a855f7); border-radius: 10px; }
-        
-        /* Avatar fallback */
-        .avatar-fallback {
-            background: linear-gradient(135deg, #5b72f5, #a855f7);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-        }
     </style>
     
     {% block extra_head %}{% endblock %}
@@ -107,33 +64,30 @@
                 
                 <!-- Desktop Menu -->
                 <div class="hidden lg:flex items-center gap-8">
-                    <a href="{{ url_for('public.index') }}" class="text-gray-700 hover:text-primary-600 font-semibold transition relative group">
-                        الرئيسية
-                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-600 group-hover:w-full transition-all duration-300"></span>
-                    </a>
-                    <a href="{{ url_for('public.doctors') }}" class="text-gray-700 hover:text-primary-600 font-semibold transition relative group">
-                        الأطباء
-                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-600 group-hover:w-full transition-all duration-300"></span>
-                    </a>
-                    <a href="{{ url_for('public.doctors') }}?specialty=" class="text-gray-700 hover:text-primary-600 font-semibold transition relative group">
-                        التخصصات
-                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-600 group-hover:w-full transition-all duration-300"></span>
-                    </a>
-                    <a href="{{ url_for('public.about') }}" class="text-gray-700 hover:text-primary-600 font-semibold transition relative group">
-                        من نحن
-                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-600 group-hover:w-full transition-all duration-300"></span>
-                    </a>
+                    <a href="{{ url_for('public.index') }}" class="text-gray-700 hover:text-primary-600 font-semibold transition">الرئيسية</a>
+                    <a href="{{ url_for('public.doctors') }}" class="text-gray-700 hover:text-primary-600 font-semibold transition">الأطباء</a>
+                    <a href="{{ url_for('public.doctors') }}?specialty=" class="text-gray-700 hover:text-primary-600 font-semibold transition">التخصصات</a>
+                    <a href="{{ url_for('public.about') }}" class="text-gray-700 hover:text-primary-600 font-semibold transition">من نحن</a>
                 </div>
                 
                 <!-- Right Actions -->
                 <div class="flex items-center gap-3">
-                    <!-- ===== تمت إزالة أيقونة البحث ===== -->
                     
-                    <!-- ===== زر لوحة التحكم للمدير فقط ===== -->
-                    {% if current_user.is_authenticated and current_user.is_admin %}
-                        <a href="{{ url_for('admin.dashboard') }}" class="hidden lg:inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary-500 to-purple-600 text-white rounded-xl hover:shadow-lg transition font-semibold text-sm">
-                            <i class="fas fa-user-shield"></i>
-                            لوحة التحكم
+                    {% if current_user.is_authenticated %}
+                        {% if current_user.is_admin %}
+                            <a href="{{ url_for('admin.dashboard') }}" class="hidden lg:inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary-500 to-purple-600 text-white rounded-xl hover:shadow-lg transition font-semibold text-sm">
+                                <i class="fas fa-user-shield"></i>
+                                لوحة التحكم
+                            </a>
+                        {% else %}
+                            <a href="{{ url_for('user.dashboard') }}" class="hidden lg:inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary-500 to-purple-600 text-white rounded-xl hover:shadow-lg transition font-semibold text-sm">
+                                <i class="fas fa-user"></i>
+                                حسابي
+                            </a>
+                        {% endif %}
+                        <a href="{{ url_for('auth.logout') }}" class="hidden lg:inline-flex items-center gap-2 px-4 py-2.5 border border-red-500 text-red-500 rounded-xl hover:bg-red-50 transition font-semibold text-sm">
+                            <i class="fas fa-sign-out-alt"></i>
+                            خروج
                         </a>
                     {% endif %}
                     
@@ -153,14 +107,16 @@
                 <a href="{{ url_for('public.doctors') }}?specialty=" class="block text-gray-700 hover:text-primary-600 font-semibold text-lg">التخصصات</a>
                 <a href="{{ url_for('public.about') }}" class="block text-gray-700 hover:text-primary-600 font-semibold text-lg">من نحن</a>
                 
-                {% if current_user.is_authenticated and current_user.is_admin %}
-                    <a href="{{ url_for('admin.dashboard') }}" class="block text-center px-5 py-3 bg-gradient-to-r from-primary-500 to-purple-600 text-white rounded-xl font-semibold">لوحة التحكم</a>
+                {% if current_user.is_authenticated %}
+                    {% if current_user.is_admin %}
+                        <a href="{{ url_for('admin.dashboard') }}" class="block text-center px-5 py-3 bg-gradient-to-r from-primary-500 to-purple-600 text-white rounded-xl font-semibold">لوحة التحكم</a>
+                    {% else %}
+                        <a href="{{ url_for('user.dashboard') }}" class="block text-center px-5 py-3 bg-gradient-to-r from-primary-500 to-purple-600 text-white rounded-xl font-semibold">حسابي</a>
+                    {% endif %}
+                    <a href="{{ url_for('auth.logout') }}" class="block text-center px-5 py-3 border-2 border-red-500 text-red-500 rounded-xl font-semibold">خروج</a>
                 {% endif %}
             </div>
         </div>
-        
-        <!-- ===== تمت إزالة شريط البحث المنسدل بالكامل ===== -->
-        
     </nav>
     
     <!-- ===== FLASH MESSAGES ===== -->
@@ -195,12 +151,6 @@
                         <span class="text-2xl font-extrabold">{{ get_platform_setting('platform_name') }}</span>
                     </div>
                     <p class="text-gray-400 text-sm leading-relaxed">{{ get_platform_setting('platform_description') }}</p>
-                    <div class="flex gap-4 mt-6">
-                        <a href="#" class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center hover:bg-primary-500 transition"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center hover:bg-primary-500 transition"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center hover:bg-primary-500 transition"><i class="fab fa-youtube"></i></a>
-                        <a href="#" class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center hover:bg-primary-500 transition"><i class="fab fa-twitter"></i></a>
-                    </div>
                 </div>
                 
                 <div>

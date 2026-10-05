@@ -1,269 +1,186 @@
-{% extends "base_admin.html" %}
+{% extends "base.html" %}
 
-{% block page_title %}
-    {{ title }}
-{% endblock %}
+{% block title %}{{ title }} - {{ get_platform_setting('platform_name') }}{% endblock %}
 
-{% block admin_content %}
-
-<div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
-
-    <h2 class="text-2xl font-bold text-gray-800 mb-6">
-        {{ title }}
-    </h2>
-
-    <form method="POST" enctype="multipart/form-data">
-
-        {{ form.csrf_token }}
-
-        <!-- ===== عرض أخطاء النموذج ===== -->
-        {% if form.errors %}
-            <div class="bg-red-50 border border-red-200 text-red-800 p-4 rounded-xl mb-6">
-                <ul class="list-disc pr-5">
-                    {% for field, errors in form.errors.items() %}
-                        {% for error in errors %}
-                            <li>{{ field }}: {{ error }}</li>
-                        {% endfor %}
-                    {% endfor %}
-                </ul>
+{% block content %}
+<section class="py-8 bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 max-w-4xl">
+        
+        <!-- Header -->
+        <div class="bg-white rounded-2xl shadow-sm p-6 mb-6">
+            <div class="flex items-center gap-4">
+                <a href="{{ url_for('user.dashboard') }}" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-arrow-right text-xl"></i>
+                </a>
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-800">{{ title }}</h1>
+                    <p class="text-sm text-gray-500">سيتم مراجعة البيانات قبل النشر</p>
+                </div>
             </div>
-        {% endif %}
-
-        <div class="grid grid-cols-2 md:grid-cols-2 gap-3 md:gap-6">
-
-            <!-- ===== الاسم (اختياري) ===== -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                    {{ form.first_name.label }}
-                    <span class="text-xs text-gray-500 font-normal">(اختياري)</span>
-                </label>
-                {{ form.first_name(
-                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent",
-                    required=False,
-                    placeholder="مثال: Mohamed"
-                ) }}
-            </div>
-
-            <!-- ===== اللقب (اختياري) ===== -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                    {{ form.last_name.label }}
-                    <span class="text-xs text-gray-500 font-normal">(اختياري)</span>
-                </label>
-                {{ form.last_name(
-                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent",
-                    required=False,
-                    placeholder="مثال: Ben Ali"
-                ) }}
-            </div>
-
-            <!-- ===== الاسم (عربي) اختياري ===== -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                    {{ form.first_name_ar.label }}
-                    <span class="text-xs text-gray-500 font-normal">(اختياري)</span>
-                </label>
-                {{ form.first_name_ar(
-                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent",
-                    placeholder="مثال: محمد"
-                ) }}
-            </div>
-
-            <!-- ===== اللقب (عربي) اختياري ===== -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                    {{ form.last_name_ar.label }}
-                    <span class="text-xs text-gray-500 font-normal">(اختياري)</span>
-                </label>
-                {{ form.last_name_ar(
-                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent",
-                    placeholder="مثال: بن علي"
-                ) }}
-            </div>
-
-            <!-- ===== التخصص (اختياري) ===== -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                    {{ form.specialty_id.label }}
-                    <span class="text-xs text-gray-500 font-normal">(اختياري)</span>
-                </label>
-                {{ form.specialty_id(
-                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                ) }}
-            </div>
-
-            <!-- ===== التخصص الفرعي (اختياري) ===== -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                    {{ form.sub_specialty.label }}
-                    <span class="text-xs text-gray-500 font-normal">(اختياري)</span>
-                </label>
-                {{ form.sub_specialty(
-                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                ) }}
-            </div>
-
-            <!-- ===== سنوات الخبرة (اختياري) ===== -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                    {{ form.experience_years.label }}
-                    <span class="text-xs text-gray-500 font-normal">(اختياري)</span>
-                </label>
-                {{ form.experience_years(
-                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                ) }}
-            </div>
-
-            <!-- ===== الولاية (إجباري) ===== -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                    {{ form.wilaya_id.label }}
-                    <span class="text-xs text-red-500 font-normal">*</span>
-                </label>
-                {{ form.wilaya_id(
-                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                ) }}
-            </div>
-
-            <!-- ===== البلدية (نصية اختياري) ===== -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                    {{ form.commune_name.label }}
-                    <span class="text-xs text-gray-500 font-normal">(اختياري)</span>
-                </label>
-                {{ form.commune_name(
-                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent",
-                    placeholder="اكتب اسم البلدية..."
-                ) }}
-            </div>
-
-            <!-- ===== العيادة (نصية اختياري) ===== -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                    {{ form.clinic_name.label }}
-                    <span class="text-xs text-gray-500 font-normal">(اختياري)</span>
-                </label>
-                {{ form.clinic_name(
-                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent",
-                    placeholder="اكتب اسم العيادة..."
-                ) }}
-            </div>
-
-            <!-- ===== العنوان (اختياري) ===== -->
-            <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                    {{ form.address.label }}
-                    <span class="text-xs text-gray-500 font-normal">(اختياري)</span>
-                </label>
-                {{ form.address(
-                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                ) }}
-            </div>
-
-            <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                    {{ form.address_ar.label }}
-                    <span class="text-xs text-gray-500 font-normal">(اختياري)</span>
-                </label>
-                {{ form.address_ar(
-                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                ) }}
-            </div>
-
-            <!-- ===== الهاتف (اختياري) ===== -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                    {{ form.phone.label }}
-                    <span class="text-xs text-gray-500 font-normal">(اختياري)</span>
-                </label>
-                {{ form.phone(
-                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                ) }}
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                    {{ form.phone_secondary.label }}
-                    <span class="text-xs text-gray-500 font-normal">(اختياري)</span>
-                </label>
-                {{ form.phone_secondary(
-                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                ) }}
-            </div>
-
-            <!-- ===== البريد الإلكتروني (اختياري) ===== -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                    {{ form.email.label }}
-                    <span class="text-xs text-gray-500 font-normal">(اختياري)</span>
-                </label>
-                {{ form.email(
-                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                ) }}
-            </div>
-
-            <!-- ===== السيرة الذاتية (اختياري) ===== -->
-            <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                    {{ form.bio.label }}
-                    <span class="text-xs text-gray-500 font-normal">(اختياري)</span>
-                </label>
-                {{ form.bio(
-                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent",
-                    rows="4"
-                ) }}
-            </div>
-
-            <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                    {{ form.bio_ar.label }}
-                    <span class="text-xs text-gray-500 font-normal">(اختياري)</span>
-                </label>
-                {{ form.bio_ar(
-                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent",
-                    rows="4"
-                ) }}
-            </div>
-
-            <!-- ===== الصورة (مع التصحيح) ===== -->
-            <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                    {{ form.profile_image.label }}
-                    <span class="text-xs text-gray-500 font-normal">(اختياري)</span>
-                </label>
-                {{ form.profile_image(
-                    class="w-full px-4 py-2 border border-gray-300 rounded-xl"
-                ) }}
-                {% if doctor and doctor.profile_image %}
-                    <img
-                        src="{{ doctor.profile_image }}"
-                        alt="صورة الطبيب"
-                        class="mt-2 w-24 h-24 rounded-full object-cover"
-                    >
-                {% endif %}
-            </div>
-
-
-        <!-- ===== الأزرار ===== -->
-        <div class="mt-6 flex gap-4">
-            <button
-                type="submit"
-                class="px-6 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition font-semibold"
-            >
-                <i class="fas fa-save ml-2"></i>
-                حفظ
-            </button>
-
-            <a
-                href="{{ url_for('admin.doctors') }}"
-                class="px-6 py-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition font-semibold"
-            >
-                إلغاء
-            </a>
         </div>
 
-    </form>
+        <!-- Info Alert -->
+        <div class="bg-blue-50 border border-blue-200 text-blue-800 rounded-xl p-4 mb-6 flex items-start gap-3">
+            <i class="fas fa-info-circle text-xl mt-1"></i>
+            <div>
+                <p class="font-semibold">ملاحظة</p>
+                <p class="text-sm">بعد إضافة الطبيب، سيراجعه فريق الإدارة قبل نشره على الموقع.</p>
+            </div>
+        </div>
 
-</div>
+        <!-- Form -->
+        <div class="bg-white rounded-2xl shadow-sm p-6">
+            <form method="POST" enctype="multipart/form-data">
+                {{ form.csrf_token }}
 
+                {% if form.errors %}
+                    <div class="bg-red-50 border border-red-200 text-red-800 p-4 rounded-xl mb-6">
+                        <ul class="list-disc pr-5">
+                            {% for field, errors in form.errors.items() %}
+                                {% for error in errors %}
+                                    <li>{{ field }}: {{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                    <!-- الاسم -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            {{ form.first_name.label }}
+                            <span class="text-xs text-gray-500">(اختياري)</span>
+                        </label>
+                        {{ form.first_name(class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500", required=False, placeholder="Mohamed") }}
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            {{ form.last_name.label }}
+                            <span class="text-xs text-gray-500">(اختياري)</span>
+                        </label>
+                        {{ form.last_name(class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500", required=False, placeholder="Ben Ali") }}
+                    </div>
+
+                    <!-- الاسم بالعربية -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.first_name_ar.label }}</label>
+                        {{ form.first_name_ar(class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500", placeholder="محمد") }}
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.last_name_ar.label }}</label>
+                        {{ form.last_name_ar(class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500", placeholder="بن علي") }}
+                    </div>
+
+                    <!-- التخصص -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.specialty_id.label }}</label>
+                        {{ form.specialty_id(class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500") }}
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.sub_specialty.label }}</label>
+                        {{ form.sub_specialty(class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500") }}
+                    </div>
+
+                    <!-- الخبرة -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.experience_years.label }}</label>
+                        {{ form.experience_years(class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500") }}
+                    </div>
+
+                    <!-- الولاية -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            {{ form.wilaya_id.label }} <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.wilaya_id(class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500") }}
+                    </div>
+
+                    <!-- البلدية -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.commune_name.label }}</label>
+                        {{ form.commune_name(class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500", placeholder="اكتب اسم البلدية") }}
+                    </div>
+
+                    <!-- العيادة -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.clinic_name.label }}</label>
+                        {{ form.clinic_name(class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500", placeholder="اكتب اسم العيادة") }}
+                    </div>
+
+                    <!-- العنوان -->
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.address.label }}</label>
+                        {{ form.address(class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500") }}
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.address_ar.label }}</label>
+                        {{ form.address_ar(class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500") }}
+                    </div>
+
+                    <!-- الهاتف -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.phone.label }}</label>
+                        {{ form.phone(class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500", placeholder="0555-123456") }}
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.phone_secondary.label }}</label>
+                        {{ form.phone_secondary(class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500") }}
+                    </div>
+
+                    <!-- البريد الإلكتروني -->
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.email.label }}</label>
+                        {{ form.email(class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500", placeholder="doctor@example.com") }}
+                    </div>
+
+                    <!-- النبذة -->
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.bio.label }}</label>
+                        {{ form.bio(class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500", rows="3") }}
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.bio_ar.label }}</label>
+                        {{ form.bio_ar(class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500", rows="3") }}
+                    </div>
+
+                    <!-- الصورة -->
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.profile_image.label }}</label>
+                        {{ form.profile_image(class="w-full px-4 py-2 border border-gray-300 rounded-xl") }}
+                        {% if doctor and doctor.profile_image %}
+                            <img src="{{ doctor.profile_image }}" alt="صورة الطبيب" class="mt-2 w-24 h-24 rounded-full object-cover">
+                        {% endif %}
+                    </div>
+
+                    <!-- يستقبل مرضى جدد -->
+                    <div class="md:col-span-2">
+                        <label class="flex items-center gap-2 text-sm text-gray-700">
+                            {{ form.accepts_new_patients }}
+                            {{ form.accepts_new_patients.label }}
+                        </label>
+                    </div>
+
+                </div>
+
+                <!-- Buttons -->
+                <div class="mt-6 flex gap-4">
+                    <button type="submit" class="px-6 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition font-semibold">
+                        <i class="fas fa-save ml-2"></i> حفظ وإرسال للمراجعة
+                    </button>
+                    <a href="{{ url_for('user.dashboard') }}" class="px-6 py-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition font-semibold">
+                        إلغاء
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
 {% endblock %}

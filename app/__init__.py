@@ -33,6 +33,22 @@ def create_app(config_name='default'):
     # Register filters
     register_filters(app)
 
+    # ============================================================
+    # ✅ GLOBAL CONTEXT PROCESSOR
+    # يجعل المتغيرات متاحة في جميع القوالب (public + admin + auth + user)
+    # ============================================================
+    @app.context_processor
+    def inject_global_data():
+        from .models import Specialty
+        try:
+            specialties = Specialty.query.filter_by(is_active=True).all()
+        except Exception:
+            specialties = []
+        
+        return {
+            'specialties': specialties
+        }
+
     # Ensure upload directory exists
     import os
     upload_dir = app.config.get('UPLOAD_FOLDER')
