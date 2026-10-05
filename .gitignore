@@ -4,3 +4,8 @@ instance/
 venv/
 __pycache__/
 *.pyc
+.env.local
+.env.production
+*.log
+*.sqlite3
+*.db-journal
