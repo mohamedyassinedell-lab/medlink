@@ -8,7 +8,7 @@ from werkzeug.utils import secure_filename
 import re
 
 
-user_bp = Blueprint('user', __name__, url_prefix='/user')
+user_bp = Blueprint('user', __name__, url_prefix='/my-account')
 
 
 def get_or_create_commune(name, wilaya_id):

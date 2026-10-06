@@ -9,14 +9,14 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # Admin settings
-    ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL') or 'admin@medlink.com'
+    ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL') or 'admin@tebguide.com'
     ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD') or 'Admin123!'
     ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME') or 'admin'
     
     # Platform settings
-    PLATFORM_NAME = os.environ.get('PLATFORM_NAME') or 'MedLink'
+    PLATFORM_NAME = os.environ.get('PLATFORM_NAME') or 'TebGuide'
     PLATFORM_DESCRIPTION = os.environ.get('PLATFORM_DESCRIPTION') or 'دليل الأطباء والعيادات في الجزائر'
-    PLATFORM_EMAIL = os.environ.get('PLATFORM_EMAIL') or 'contact@medlink.dz'
+    PLATFORM_EMAIL = os.environ.get('PLATFORM_EMAIL') or 'contact@tebguide.com'
     PLATFORM_PHONE = os.environ.get('PLATFORM_PHONE') or '0698766662'
     PLATFORM_ADDRESS = os.environ.get('PLATFORM_ADDRESS') or 'الجزائر العاصمة، الجزائر'
     

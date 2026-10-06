@@ -121,7 +121,7 @@ def require_admin():
 # لوحة التحكم
 # ============================================================
 
-@admin_bp.route('/')
+@admin_bp.route('/dashboard')
 def dashboard():
     doctor_count = Doctor.query.count()
     clinic_count = Clinic.query.count()
@@ -169,7 +169,7 @@ def force_seed():
 # نظام الموافقة على الأطباء المُقترحين
 # ============================================================
 
-@admin_bp.route('/pending-doctors')
+@admin_bp.route('/requests')
 def pending_doctors():
     """الأطباء في انتظار الموافقة (المُضافون من المستخدمين)"""
     pending = Doctor.query.filter_by(is_approved=False).order_by(Doctor.created_at.desc()).all()
