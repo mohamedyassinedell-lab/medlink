@@ -123,95 +123,21 @@ def seed_database():
 
     specialties_data = [
 
-        {
-            'name': 'General Medicine',
-            'name_ar': 'الطب العام',
-            'icon': 'stethoscope'
-        },
-
-        {
-            'name': 'Dentistry',
-            'name_ar': 'طب الأسنان',
-            'icon': 'tooth'
-        },
-
-        {
-            'name': 'Cardiology',
-            'name_ar': 'أمراض القلب',
-            'icon': 'heart'
-        },
-
-        {
-            'name': 'Pediatrics',
-            'name_ar': 'طب الأطفال',
-            'icon': 'child'
-        },
-
-        {
-            'name': 'Ophthalmology',
-            'name_ar': 'طب العيون',
-            'icon': 'eye'
-        },
-
-        {
-            'name': 'Dermatology',
-            'name_ar': 'الأمراض الجلدية',
-            'icon': 'hand-sparkles'
-        },
-
-        {
-            'name': 'Gynecology',
-            'name_ar': 'أمراض النساء',
-            'icon': 'female'
-        },
-
-        {
-            'name': 'Surgery',
-            'name_ar': 'الجراحة',
-            'icon': 'scissors'
-        },
-
-        {
-            'name': 'Orthopedics',
-            'name_ar': 'جراحة العظام',
-            'icon': 'bone'
-        },
-
-        {
-            'name': 'Neurology',
-            'name_ar': 'طب الأعصاب',
-            'icon': 'brain'
-        },
-
-        {
-            'name': 'Psychiatry',
-            'name_ar': 'الطب النفسي',
-            'icon': 'brain'
-        },
-
-        {
-            'name': 'Radiology',
-            'name_ar': 'الأشعة',
-            'icon': 'x-ray'
-        },
-
-        {
-            'name': 'Internal Medicine',
-            'name_ar': 'الطب الباطني',
-            'icon': 'stethoscope'
-        },
-
-        {
-            'name': 'Endocrinology',
-            'name_ar': 'الغدد الصماء',
-            'icon': 'droplet'
-        },
-
-        {
-            'name': 'Emergency Medicine',
-            'name_ar': 'طب الطوارئ',
-            'icon': 'ambulance'
-        },
+        {'name': 'General Medicine', 'name_ar': 'الطب العام', 'icon': 'stethoscope'},
+        {'name': 'Dentistry', 'name_ar': 'طب الأسنان', 'icon': 'tooth'},
+        {'name': 'Cardiology', 'name_ar': 'أمراض القلب', 'icon': 'heart'},
+        {'name': 'Pediatrics', 'name_ar': 'طب الأطفال', 'icon': 'child'},
+        {'name': 'Ophthalmology', 'name_ar': 'طب العيون', 'icon': 'eye'},
+        {'name': 'Dermatology', 'name_ar': 'الأمراض الجلدية', 'icon': 'hand-sparkles'},
+        {'name': 'Gynecology', 'name_ar': 'أمراض النساء', 'icon': 'female'},
+        {'name': 'Surgery', 'name_ar': 'الجراحة', 'icon': 'scissors'},
+        {'name': 'Orthopedics', 'name_ar': 'جراحة العظام', 'icon': 'bone'},
+        {'name': 'Neurology', 'name_ar': 'طب الأعصاب', 'icon': 'brain'},
+        {'name': 'Psychiatry', 'name_ar': 'الطب النفسي', 'icon': 'brain'},
+        {'name': 'Radiology', 'name_ar': 'الأشعة', 'icon': 'x-ray'},
+        {'name': 'Internal Medicine', 'name_ar': 'الطب الباطني', 'icon': 'stethoscope'},
+        {'name': 'Endocrinology', 'name_ar': 'الغدد الصماء', 'icon': 'droplet'},
+        {'name': 'Emergency Medicine', 'name_ar': 'طب الطوارئ', 'icon': 'ambulance'},
     ]
 
     for data in specialties_data:
@@ -235,13 +161,38 @@ def seed_database():
 
 
     # =========================================================
-    # 4. الأطباء الحقيقيون الموثقون من مصادر علنية
+    # 4. الأطباء
     # =========================================================
 
     DOCTORS_DATA = [
 
+        # =========================
+        # PÉDIATRIE - ALGER
+        # =========================
+
+        {'first_name': 'Cherif', 'last_name': 'Abdelouahab', 'first_name_ar': None, 'last_name_ar': None, 'specialty': 'Pediatrics', 'wilaya': '16', 'commune': 'Sidi Mhamed', 'commune_ar': None, 'clinic': None, 'clinic_ar': None, 'phone': None},
+        {'first_name': 'Fares', 'last_name': 'Ameur', 'first_name_ar': None, 'last_name_ar': None, 'specialty': 'Pediatrics', 'wilaya': '16', 'commune': 'Djasr Kasentina', 'commune_ar': None, 'clinic': None, 'clinic_ar': None, 'phone': '0557706676'},
+        {'first_name': 'Sabrine', 'last_name': 'Larabi Harkat', 'first_name_ar': None, 'last_name_ar': None, 'specialty': 'Pediatrics', 'wilaya': '16', 'commune': 'Baraki', 'commune_ar': None, 'clinic': None, 'clinic_ar': None, 'phone': None},
+        {'first_name': 'Mahrez', 'last_name': 'Belmokhtar', 'first_name_ar': None, 'last_name_ar': None, 'specialty': 'Pediatrics', 'wilaya': '16', 'commune': 'Rouiba', 'commune_ar': None, 'clinic': None, 'clinic_ar': None, 'phone': '021218469'},
+        {'first_name': 'Lahcene Tewfik', 'last_name': 'Zerhouni', 'first_name_ar': None, 'last_name_ar': None, 'specialty': 'Pediatrics', 'wilaya': '16', 'commune': 'Bab Ezzouar', 'commune_ar': None, 'clinic': None, 'clinic_ar': None, 'phone': '021248693'},
+        {'first_name': 'Lamia', 'last_name': 'Ben Amara', 'first_name_ar': None, 'last_name_ar': None, 'specialty': 'Pediatrics', 'wilaya': '16', 'commune': 'Cheraga', 'commune_ar': None, 'clinic': None, 'clinic_ar': None, 'phone': '0559399117'},
+        {'first_name': 'Ismail', 'last_name': 'Ali-Pacha', 'first_name_ar': None, 'last_name_ar': None, 'specialty': 'Pediatrics', 'wilaya': '16', 'commune': 'Bab Ezzouar', 'commune_ar': None, 'clinic': None, 'clinic_ar': None, 'phone': '021517371'},
+        {'first_name': 'Reda', 'last_name': 'Bouafia', 'first_name_ar': None, 'last_name_ar': None, 'specialty': 'Pediatrics', 'wilaya': '16', 'commune': 'Djasr Kasentina', 'commune_ar': None, 'clinic': None, 'clinic_ar': None, 'phone': '021556999'},
+        {'first_name': 'Fella', 'last_name': 'Boukerrou', 'first_name_ar': None, 'last_name_ar': None, 'specialty': 'Pediatrics', 'wilaya': '16', 'commune': 'Mohamed Belouzdad', 'commune_ar': None, 'clinic': None, 'clinic_ar': None, 'phone': '021661318'},
+        {'first_name': 'Fairouze', 'last_name': 'Kellal', 'first_name_ar': None, 'last_name_ar': None, 'specialty': 'Pediatrics', 'wilaya': '16', 'commune': 'Hussein Dey', 'commune_ar': None, 'clinic': None, 'clinic_ar': None, 'phone': '021776810'},
+        {'first_name': 'Mohamed Ahmed', 'last_name': 'Rais', 'first_name_ar': None, 'last_name_ar': None, 'specialty': 'Pediatrics', 'wilaya': '16', 'commune': 'Hussein Dey', 'commune_ar': None, 'clinic': None, 'clinic_ar': None, 'phone': '021779884'},
+        {'first_name': 'Jamel Bey', 'last_name': 'Zerier', 'first_name_ar': None, 'last_name_ar': None, 'specialty': 'Pediatrics', 'wilaya': '16', 'commune': 'Hussein Dey', 'commune_ar': None, 'clinic': None, 'clinic_ar': None, 'phone': None},
+        {'first_name': 'Sakina', 'last_name': 'Kherra', 'first_name_ar': None, 'last_name_ar': None, 'specialty': 'Pediatrics', 'wilaya': '16', 'commune': 'Hussein Dey', 'commune_ar': None, 'clinic': None, 'clinic_ar': None, 'phone': '0551166418'},
+        {'first_name': 'Mourad', 'last_name': 'Mellah', 'first_name_ar': None, 'last_name_ar': None, 'specialty': 'Pediatrics', 'wilaya': '16', 'commune': 'Hussein Dey', 'commune_ar': None, 'clinic': None, 'clinic_ar': None, 'phone': '0541801026'},
+        {'first_name': 'Zoulkha', 'last_name': 'Khemies', 'first_name_ar': None, 'last_name_ar': None, 'specialty': 'Pediatrics', 'wilaya': '16', 'commune': 'Sidi Moussa', 'commune_ar': None, 'clinic': None, 'clinic_ar': None, 'phone': '021767553'},
+        {'first_name': 'Ahmed', 'last_name': 'Chekiri', 'first_name_ar': None, 'last_name_ar': None, 'specialty': 'Pediatrics', 'wilaya': '16', 'commune': 'Sidi Moussa', 'commune_ar': None, 'clinic': None, 'clinic_ar': None, 'phone': '0558282300'},
+        {'first_name': 'Hafida', 'last_name': 'Stiti', 'first_name_ar': None, 'last_name_ar': None, 'specialty': 'Pediatrics', 'wilaya': '16', 'commune': 'Sidi Moussa', 'commune_ar': None, 'clinic': None, 'clinic_ar': None, 'phone': '0795971032'},
+        {'first_name': 'Ouahiba', 'last_name': 'Ouarek', 'first_name_ar': None, 'last_name_ar': None, 'specialty': 'Pediatrics', 'wilaya': '16', 'commune': 'Mohamed Belouzdad', 'commune_ar': None, 'clinic': None, 'clinic_ar': None, 'phone': '0772126418'},
+        {'first_name': 'Latifa', 'last_name': 'Guermouche Toumi', 'first_name_ar': None, 'last_name_ar': None, 'specialty': 'Pediatrics', 'wilaya': '16', 'commune': 'Mohamed Belouzdad', 'commune_ar': None, 'clinic': None, 'clinic_ar': None, 'phone': '0668216239'},
+        {'first_name': 'Ouahiba', 'last_name': 'Hammouche Baadj', 'first_name_ar': None, 'last_name_ar': None, 'specialty': 'Pediatrics', 'wilaya': '16', 'commune': 'Staoueli', 'commune_ar': None, 'clinic': None, 'clinic_ar': None, 'phone': '021393060'},
+
         # =====================================================
-        # CARDIOLOGY - ALGER
+        # OPHTHALMOLOGY
         # =====================================================
 
         {
@@ -1322,7 +1273,6 @@ def seed_database():
             )
             continue
 
-        # البحث عن البلدية
         commune = Commune.query.filter_by(
             name=data['commune'],
             wilaya_id=wilaya.id
@@ -1331,7 +1281,7 @@ def seed_database():
         if not commune:
             commune = Commune(
                 name=data['commune'],
-                name_ar=data['commune_ar'],
+                name_ar=data.get('commune_ar'),
                 wilaya_id=wilaya.id
             )
             db.session.add(commune)
@@ -1340,7 +1290,7 @@ def seed_database():
 
 
     # =========================================================
-    # 6. إضافة الأطباء (مع التعديلات الجديدة)
+    # 6. إضافة الأطباء
     # =========================================================
 
     added_count = 0
@@ -1348,7 +1298,6 @@ def seed_database():
 
     for data in DOCTORS_DATA:
 
-        # البحث عن التخصص
         specialty = Specialty.query.filter_by(
             name=data['specialty']
         ).first()
@@ -1362,7 +1311,6 @@ def seed_database():
             skipped_count += 1
             continue
 
-        # البحث عن الولاية
         wilaya = Wilaya.query.filter_by(
             code=data['wilaya']
         ).first()
@@ -1375,7 +1323,6 @@ def seed_database():
             skipped_count += 1
             continue
 
-        # البحث عن البلدية
         commune = Commune.query.filter_by(
             name=data['commune'],
             wilaya_id=wilaya.id
@@ -1384,13 +1331,12 @@ def seed_database():
         if not commune:
             commune = Commune(
                 name=data['commune'],
-                name_ar=data['commune_ar'],
+                name_ar=data.get('commune_ar'),
                 wilaya_id=wilaya.id
             )
             db.session.add(commune)
             db.session.flush()
 
-        # منع تكرار الطبيب (محسّن)
         existing_doctor = Doctor.query.filter(
             Doctor.first_name == data['first_name'],
             Doctor.last_name == data['last_name'],
@@ -1406,7 +1352,6 @@ def seed_database():
             skipped_count += 1
             continue
 
-        # إنشاء العيادة فقط إذا كانت موجودة في البيانات
         clinic = None
 
         if data.get('clinic') and data['clinic'].strip():
@@ -1428,7 +1373,6 @@ def seed_database():
                 db.session.add(clinic)
                 db.session.flush()
 
-        # إنشاء الطبيب (مع phone اختياري و clinic_id اختياري)
         doctor = Doctor(
             first_name=data['first_name'],
             last_name=data['last_name'],
@@ -1437,7 +1381,7 @@ def seed_database():
             specialty_id=specialty.id,
             wilaya_id=wilaya.id,
             commune_id=commune.id if commune else None,
-            phone=data.get('phone'),  # أصبح nullable=True
+            phone=data.get('phone'),
             clinic_id=clinic.id if clinic else None,
             accepts_new_patients=True,
             is_verified=True,
@@ -1446,7 +1390,6 @@ def seed_database():
             is_active=True
         )
 
-        # إنشاء slug
         try:
             doctor.slug = doctor.generate_slug()
         except Exception:
@@ -1455,7 +1398,6 @@ def seed_database():
         db.session.add(doctor)
         db.session.flush()
 
-       
         added_count += 1
 
         print(
@@ -1474,65 +1416,16 @@ def seed_database():
 
     services_data = [
 
-        {
-            'name': 'Consultation',
-            'name_ar': 'استشارة',
-            'description': 'Medical consultation'
-        },
-
-        {
-            'name': 'Examination',
-            'name_ar': 'فحص طبي',
-            'description': 'Medical examination'
-        },
-
-        {
-            'name': 'Dental Cleaning',
-            'name_ar': 'تنظيف الأسنان',
-            'description': 'Professional teeth cleaning'
-        },
-
-        {
-            'name': 'Eye Examination',
-            'name_ar': 'فحص النظر',
-            'description': 'Comprehensive eye exam'
-        },
-
-        {
-            'name': 'Treatment',
-            'name_ar': 'علاج',
-            'description': 'Medical treatment'
-        },
-
-        {
-            'name': 'Surgery',
-            'name_ar': 'جراحة',
-            'description': 'Surgical procedure'
-        },
-
-        {
-            'name': 'X-Ray',
-            'name_ar': 'أشعة',
-            'description': 'X-ray imaging'
-        },
-
-        {
-            'name': 'Ultrasound',
-            'name_ar': 'تصوير بالموجات فوق الصوتية',
-            'description': 'Ultrasound imaging'
-        },
-
-        {
-            'name': 'Blood Test',
-            'name_ar': 'فحص الدم',
-            'description': 'Blood analysis'
-        },
-
-        {
-            'name': 'ECG',
-            'name_ar': 'تخطيط القلب',
-            'description': 'Electrocardiogram'
-        },
+        {'name': 'Consultation', 'name_ar': 'استشارة', 'description': 'Medical consultation'},
+        {'name': 'Examination', 'name_ar': 'فحص طبي', 'description': 'Medical examination'},
+        {'name': 'Dental Cleaning', 'name_ar': 'تنظيف الأسنان', 'description': 'Professional teeth cleaning'},
+        {'name': 'Eye Examination', 'name_ar': 'فحص النظر', 'description': 'Comprehensive eye exam'},
+        {'name': 'Treatment', 'name_ar': 'علاج', 'description': 'Medical treatment'},
+        {'name': 'Surgery', 'name_ar': 'جراحة', 'description': 'Surgical procedure'},
+        {'name': 'X-Ray', 'name_ar': 'أشعة', 'description': 'X-ray imaging'},
+        {'name': 'Ultrasound', 'name_ar': 'تصوير بالموجات فوق الصوتية', 'description': 'Ultrasound imaging'},
+        {'name': 'Blood Test', 'name_ar': 'فحص الدم', 'description': 'Blood analysis'},
+        {'name': 'ECG', 'name_ar': 'تخطيط القلب', 'description': 'Electrocardiogram'},
 
     ]
 
@@ -1562,35 +1455,11 @@ def seed_database():
 
     platform_settings = [
 
-        {
-            'key': 'platform_name',
-            'value': 'MedLink',
-            'category': 'general'
-        },
-
-        {
-            'key': 'platform_description',
-            'value': 'دليل الأطباء والعيادات في الجزائر',
-            'category': 'general'
-        },
-
-        {
-            'key': 'platform_email',
-            'value': 'contact@medlink.dz',
-            'category': 'contact'
-        },
-
-        {
-            'key': 'platform_phone',
-            'value': '0698766662',
-            'category': 'contact'
-        },
-
-        {
-            'key': 'platform_address',
-            'value': 'الجزائر العاصمة، الجزائر',
-            'category': 'contact'
-        },
+        {'key': 'platform_name', 'value': 'TebGuide', 'category': 'general'},
+        {'key': 'platform_description', 'value': 'دليل الأطباء والعيادات في الجزائر', 'category': 'general'},
+        {'key': 'platform_email', 'value': 'contact@tebguide.com', 'category': 'contact'},
+        {'key': 'platform_phone', 'value': '0698766662', 'category': 'contact'},
+        {'key': 'platform_address', 'value': 'الجزائر العاصمة، الجزائر', 'category': 'contact'},
 
     ]
 

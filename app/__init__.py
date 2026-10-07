@@ -1,7 +1,8 @@
+from datetime import timedelta
 from flask import Flask
 from flask_migrate import Migrate
 from flask_login import LoginManager
-from .extensions import db, migrate, login_manager
+from .extensions import db, migrate, login_manager, jwt, cors
 from config import config
 from .utils.helpers import register_filters
 
@@ -19,6 +20,21 @@ def create_app(config_name='default'):
     login_manager.login_message = 'يرجى تسجيل الدخول أولاً'
     login_manager.login_message_category = 'warning'
 
+    # === JWT Configuration ===
+    app.config['JWT_SECRET_KEY'] = app.config['SECRET_KEY']
+    app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=24)
+    app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(days=30)
+    jwt.init_app(app)
+
+    # === CORS Configuration (Flutter mobile) ===
+    cors.init_app(
+        app,
+        resources={r"/api/*": {"origins": "*"}},
+        supports_credentials=True,
+        allow_headers=["Content-Type", "Authorization"],
+        methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    )
+
     # Register blueprints
     from .routes.public import public_bp
     from .routes.admin import admin_bp
@@ -30,13 +46,14 @@ def create_app(config_name='default'):
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(user_bp)
 
+    # === API blueprint for mobile ===
+    from .api import api_bp
+    app.register_blueprint(api_bp, url_prefix='/api')
+
     # Register filters
     register_filters(app)
 
-    # ============================================================
-    # ✅ GLOBAL CONTEXT PROCESSOR
-    # يجعل المتغيرات متاحة في جميع القوالب (public + admin + auth + user)
-    # ============================================================
+    # Global context processor
     @app.context_processor
     def inject_global_data():
         from .models import Specialty
@@ -44,7 +61,7 @@ def create_app(config_name='default'):
             specialties = Specialty.query.filter_by(is_active=True).all()
         except Exception:
             specialties = []
-        
+
         return {
             'specialties': specialties
         }
