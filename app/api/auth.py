@@ -14,20 +14,16 @@ from app.api.blueprint import api_bp
 @api_bp.route('/auth/register', methods=['POST'])
 def api_register():
     data = request.get_json() or {}
-
     username = (data.get('username') or '').strip()
     email = (data.get('email') or '').strip().lower()
     password = data.get('password') or ''
 
     if not username or not email or not password:
         return jsonify({'error': 'جميع الحقول مطلوبة'}), 400
-
     if len(password) < 6:
         return jsonify({'error': 'كلمة المرور قصيرة جداً (6 أحرف على الأقل)'}), 400
-
     if User.query.filter_by(email=email).first():
         return jsonify({'error': 'البريد الإلكتروني مستخدم مسبقاً'}), 409
-
     if User.query.filter_by(username=username).first():
         return jsonify({'error': 'اسم المستخدم مستخدم مسبقاً'}), 409
 
@@ -53,15 +49,12 @@ def api_login():
     password = data.get('password') or ''
 
     user = User.query.filter_by(email=email).first()
-
     if not user or not user.check_password(password):
         return jsonify({'error': 'بيانات الدخول غير صحيحة'}), 401
-
     if not user.is_active:
         return jsonify({'error': 'الحساب معطّل'}), 403
-
     if user.is_admin:
-        return jsonify({'error': 'استخدم تطبيق الويب للإدارة'}), 403
+        return jsonify({'error': 'استخدم صفحة دخول الإدارة'}), 403
 
     user.last_login = datetime.utcnow()
     db.session.commit()
@@ -96,4 +89,44 @@ def api_me():
         'username': user.username,
         'email': user.email,
         'created_at': user.created_at.isoformat() if user.created_at else None,
+    })
+
+
+@api_bp.route('/auth/forgot-password', methods=['POST'])
+def api_forgot_password():
+    data = request.get_json() or {}
+    email = (data.get('email') or '').strip().lower()
+    if not email:
+        return jsonify({'error': 'البريد الإلكتروني مطلوب'}), 400
+
+    # للأمان، لا نكشف إن كان البريد موجوداً
+    return jsonify({
+        'message': 'إذا كان البريد مسجّلاً، سيصلك رابط الاستعادة'
+    })
+
+
+@api_bp.route('/auth/admin-login', methods=['POST'])
+def api_admin_login():
+    data = request.get_json() or {}
+    email = (data.get('email') or '').strip().lower()
+    password = data.get('password') or ''
+
+    user = User.query.filter_by(email=email).first()
+    if not user or not user.check_password(password):
+        return jsonify({'error': 'بيانات الدخول غير صحيحة'}), 401
+    if not user.is_active:
+        return jsonify({'error': 'الحساب معطّل'}), 403
+    if not user.is_admin:
+        return jsonify({'error': 'هذا الحساب ليس حساب إدارة'}), 403
+
+    user.last_login = datetime.utcnow()
+    db.session.commit()
+
+    access = create_access_token(identity=str(user.id))
+    refresh = create_refresh_token(identity=str(user.id))
+
+    return jsonify({
+        'user': {'id': user.id, 'username': user.username, 'email': user.email},
+        'access_token': access,
+        'refresh_token': refresh,
     })
